@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Semanal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* MODO IDOSO - Interface Adaptada */
+        .modo-idoso {
+            font-size: 22px !important;
+            line-height: 1.6;
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        .modo-idoso .container {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        .modo-idoso .agenda {
+            grid-template-columns: repeat(4, 1fr); /* Mantém 4 colunas */
+            grid-template-rows: 1fr 1fr; /* Mantém 2 linhas */
+            gap: 15px !important;
+        }
+
+        .modo-idoso .dia {
+            padding: 25px !important;
+            border: 3px solid #333 !important;
+            background-color: #f8f9fa !important;
+        }
+
+        .modo-idoso .dia h2 {
+            font-size: 26px !important;
+            font-weight: bold !important;
+            color: #000 !important;
+        }
+
+        .modo-idoso button {
+            min-height: 50px !important;
+            font-size: 20px !important;
+            font-weight: bold !important;
+            padding: 15px 20px !important;
+        }
+
+        .modo-idoso ul li {
+            font-size: 20px !important;
+            padding: 20px !important;
+            margin: 15px 0 !important;
+            border-left-width: 6px !important;
+        }
+
+        .modo-idoso ul li .horario-medicamento {
+            font-size: 22px !important;
+        }
+
+        .modo-idoso ul li .nome-medicamento {
+            font-size: 20px !important;
+        }
+
+        .modo-idoso ul li .observacoes-medicamento {
+            font-size: 18px !important;
+        }
+
+        .modo-idoso .remove-button {
+            width: 45px !important;
+            height: 45px !important;
+            font-size: 24px !important;
+        }
+
+        .modo-idoso .data {
+            font-size: 18px !important;
+            padding: 8px 12px !important;
+            background-color: #007bff !important;
+            color: white !important;
+            font-weight: bold !important;
+        }
+
+        /* Estilo Normal */
+        .container {
+            padding: 50px;
+            max-width: 2000px;
+            margin: 0 auto;
+            background-color: #5eb4e8;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 15px;
+            border-radius: 25px;
+            color: white;
+        }
+
+        .modo-toggle {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 4999;
+        }
+        
+        .menu-overlay.show {
+            display: block;
+        }
+
+        .menu {
+            width: 200px;
+            background-color: #fec364;
+            color: white;
+            padding: 20px 5px; /* ALTERADO - adicionar padding superior */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed; /* ALTERADO de absolute para fixed */
+            top: 0;
+            left: -220px; /* ALTERADO de -400px para -220px */
+            height: 100vh; /* ADICIONE - altura total da viewport */
+            transition: left 0.3s ease;
+            z-index: 5000;
+            overflow-y: auto; /* ADICIONE - scroll se necessário */
+        }
+
+        .menu ul {
+            list-style-type: none;
+            padding: 12px;
+        }
+
+        .menu li {
+            margin: 15px 0;
+        }
+
+        .menu a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            border-radius: 30px;
+            transition: background 0.3s;
+        }
+
+        .menu a:hover {
+            background-color: #f0ae45;
+        }
+
+        .agenda {
+            display: grid; /* ALTERADO de flex para grid */
+            grid-template-columns: repeat(4, 1fr); /* ADICIONE - 4 colunas na primeira linha */
+            grid-template-rows: 1fr 1fr; /* ADICIONE - 2 linhas */
+            gap: 10px; /* ADICIONE - espaçamento entre os dias */
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px; /* ADICIONE */
+            position: relative;
+        }
+
+        .dia {
+            flex: none; /* ALTERADO de 1 para none */
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            position: relative;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #ddd; /* ADICIONE - borda em todos os lados */
+            border-radius: 8px; /* ADICIONE */
+        }
+
+        /*.dia:not(:last-child) {
+            border-right: 1px solid #ddd;
+        }*/
+
+        .dia h2 {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 8px;
+            margin-top: 25px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 5px;
+            flex-grow: 1;
+            text-align: left;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        ul li {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin-bottom: 10px; /* ALTERADO de 12px para 10px */
+            padding: 12px; /* ALTERADO de 15px para 12px */
+            padding-right: 40px; /* ALTERADO de 45px para 40px */
+            border-radius: 10px; /* ALTERADO de 12px para 10px */
+            border-left: 3px solid #FEC364; /* ALTERADO de 4px para 3px */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6px; /* ALTERADO de 8px para 6px */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        ul li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-left-color: #f0ae45;
+        }
+
+        ul li .horario-medicamento {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #2c3e50;
+            flex-wrap: wrap;
+        }
+
+        ul li .horario-medicamento i {
+            color: #FEC364;
+        }
+
+        ul li .nome-medicamento {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #34495e;
+            font-weight: 600;
+            flex-wrap: wrap; /* ADICIONE ESTA LINHA */
+            word-break: break-word; /* ADICIONE ESTA LINHA */
+        }
+
+        ul li .nome-medicamento i {
+            color: #3498db;
+        }
+
+        ul li .observacoes-medicamento {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px; /* ALTERADO de 8px para 6px */
+            font-size: 11px; /* ALTERADO de 12px para 11px */
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 6px; /* ALTERADO de 8px para 6px */
+            background: rgba(254, 195, 100, 0.1);
+            border-radius: 5px; /* ALTERADO de 6px para 5px */
+            margin-top: 4px; /* ALTERADO de 5px para 4px */
+            word-break: break-word;
+        }
+
+        ul li .observacoes-medicamento i {
+            color: #f39c12;
+            margin-top: 2px;
+        }
+
+        .img-preview {
+            margin-top: 8px; /* ALTERADO de 10px para 8px */
+            max-width: 70px; /* ALTERADO de 80px para 70px */
+            max-height: 70px; /* ALTERADO de 80px para 70px */
+            border-radius: 6px; /* ALTERADO de 8px para 6px */
+            border: 2px solid #ecf0f1;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .img-preview:hover {
+            transform: scale(1.1);
+        }
+
+        .remove-button {
+            position: absolute;
+            top: 8px; /* ALTERADO de 10px para 8px */
+            right: 8px; /* ALTERADO de 10px para 8px */
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px; /* ALTERADO de 18px para 16px */
+            width: 28px; /* ALTERADO de 32px para 28px */
+            height: 28px; /* ALTERADO de 32px para 28px */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+        }
+
+        .remove-button:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.5);
+        }
+
+        .remove-button:active {
+            transform: rotate(90deg) scale(0.95);
+        }
+
+        ul:empty::before {
+            content: "Nenhum medicamento cadastrado";
+            display: block;
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+            padding: 30px;
+        }
+
+        .data {
+            position: absolute;
+            top: 8px; /* ALTERADO de 10px para 8px */
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            background-color: #fec364;
+            color: white;
+            padding: 2px 4px; /* ALTERADO de 2px 5px para 2px 4px */
+            border-radius: 3px;
+            font-size: 11px; /* ALTERADO de 12px para 11px */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 375px;
+        }
+
+        .close {
+            cursor: pointer;
+            color: #007bff;
+            margin-top: 10px;
+        }
+
+        input[type="text"], input[type="time"], textarea, input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #fec364;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #f0ae45;
+        }
+
+        .checkbox-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .button-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 5001;
+        }
+
+        .button-container button {
+            background-color: #fec364;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px; /* ADICIONE */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* ADICIONE */
+        }
+        
+        .button-container button:hover {
+            background-color: #f0ae45;
+        }
+
+        .download-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            z-index: 1001;
+        }
+
+        .menu-toggle.show {
+            display: flex;
+        }
+
+        .readonly-mode .dia {
+            cursor: default !important;
+        }
+
+        .readonly-mode .modal {
+            display: none !important;
+        }
+
+        .cuidador-info {
+            background: rgba(0,0,0,0.3); /* ALTERADO de 0.1 para 0.3 - mais escuro */
+            color: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-left: auto;
+            font-weight: 600; /* ADICIONE - texto mais forte */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2); /* ADICIONE - sombra no texto */
+        }
+
+        @media (max-width: 768px) {
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .agenda {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .dia {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <button onclick="toggleMenu()">☰</button>
+        <div class="menu-toggle" id="menuToggle">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    
+    <div class="menu" id="menu">
+        <ul>
+            <li><a href="editUser.html">Perfil</a></li>
+            <li><a href="#" onclick="voltarDashboard()">Dashboard</a></li>
+            <li><a href="index.html" onclick="sair()">Sair</a></li>
+        </ul>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+    
+    <div class="container">
+        <div class="controls-bar">
+            <div class="user-info" id="userInfo">
+                <i class="fas fa-user"></i>
+                <span id="nomeUsuario">Carregando...</span>
+            </div>
+            
+            <h1>Agenda de Medicamentos</h1>
+            
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="modo-toggle" id="modoToggle" onclick="toggleModoIdoso()" style="display: none;">
+                    Modo Idoso
+                </button>
+                <button class="download-button" onclick="baixarAgenda()">Baixar Agenda</button>
+            </div>
+        </div>
+
+        <div class="cuidador-info" id="cuidadorInfo" style="display: none;">
+            <i class="fas fa-info-circle"></i>
+            <span>Gerenciando medicamentos de: <strong id="nomePaciente"></strong></span>
+        </div>
+        
+        <div class="agenda" id="agenda">
+            <div class="dia" onclick="abrirModal()">
+                <h2>Segunda-feira</h2>
+                <span class="data" id="data-segunda"></span>
+                <ul id="lista-segunda"></ul>
+            </div>
+            <div class="dia" onclick="abrirModal()">
+                <h2>Terça-feira</h2>
+                <span class="data" id="data-terca"></span>
+                <ul id="lista-terca"></ul>
+            </div>
+            <div class="dia" onclick="abrirModal()">
+                <h2>Quarta-feira</h2>
+                <span class="data" id="data-quarta"></span>
+                <ul id="lista-quarta"></ul>
+            </div>
+            <div class="dia" onclick="abrirModal()">
+                <h2>Quinta-feira</h2>
+                <span class="data" id="data-quinta"></span>
+                <ul id="lista-quinta"></ul>
+            </div>
+            <div class="dia" onclick="abrirModal()">
+                <h2>Sexta-feira</h2>
+                <span class="data" id="data-sexta"></span>
+                <ul id="lista-sexta"></ul>
+            </div>
+            <div class="dia" onclick="abrirModal()">
+                <h2>Sábado</h2>
+                <span class="data" id="data-sabado"></span>
+                <ul id="lista-sabado"></ul>
+            </div>
+            <div class="dia" onclick="abrirModal()">
+                <h2>Domingo</h2>
+                <span class="data" id="data-domingo"></span>
+                <ul id="lista-domingo"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2>Adicionar Medicamento</h2>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="check-segunda">Seg</label>
+                <label><input type="checkbox" id="check-terca">Ter</label>
+                <label><input type="checkbox" id="check-quarta">Qua</label>
+                <label><input type="checkbox" id="check-quinta">Qui</label>
+                <label><input type="checkbox" id="check-sexta">Sex</label>
+                <label><input type="checkbox" id="check-sabado">Sáb</label>
+                <label><input type="checkbox" id="check-domingo">Dom</label>
+            </div>
+            <form id="form-remedio">
+                <input type="text" id="remedio" placeholder="Nome do medicamento" required>
+                <input type="time" id="horario" placeholder="Horário" required>
+                <textarea id="observacoes" rows="3" placeholder="Observações" style="text-align: center;"></textarea>
+                <input type="file" id="imagem" accept="image/*" onchange="mostrarImagem(event)">
+                <img id="imagem-preview" class="img-preview" style="display:none;">
+                <button type="submit">Adicionar</button>
+                <div class="close" onclick="fecharModal()">Fechar</div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+        import { adicionarRemedioFirestore, carregarRemediosFirestore, removerRemedioFirestore} from './firestore.js';
+
+        const auth = getAuth();
+        let userId = null;
+        let currentUser = null;
+        let isReadOnlyMode = false;
+        let isModoIdoso = false;
+
+        onAuthStateChanged(auth, async user => {
+            if (user) {
+                currentUser = user;
+                await inicializarInterface(user.uid);
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        async function inicializarInterface(uid) {
+            const idosoGerenciado = localStorage.getItem('idosoGerenciado');
+            
+            if (idosoGerenciado) {
+                userId = idosoGerenciado;
+                await configurarModoCuidador(uid, idosoGerenciado);
+            } else {
+                userId = uid;
+                await configurarModoUsuario(uid);
+            }
+
+            await carregarRemediosFirestore(userId);
+            gerarDatasDaSemana();
+        }
+
+        async function configurarModoCuidador(cuidadorId, idosoId) {
+            try {
+                const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js");
+                const db = getFirestore();
+                
+                const idosoDoc = await getDoc(doc(db, 'medidoso', idosoId, 'perfil', 'dados'));
+                const cuidadorDoc = await getDoc(doc(db, 'medidoso', cuidadorId, 'perfil', 'dados'));
+                
+                if (idosoDoc.exists() && cuidadorDoc.exists()) {
+                    const idosoData = idosoDoc.data();
+                    const cuidadorData = cuidadorDoc.data();
+                    
+                    document.getElementById('nomeUsuario').textContent = cuidadorData.nome + ' (Cuidador)';
+                    document.getElementById('cuidadorInfo').style.display = 'block';
+                    document.getElementById('nomePaciente').textContent = idosoData.nome;
+                    
+                    document.getElementById('modoToggle').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro ao configurar modo cuidador:', error);
+            }
+        }
+
+        async function configurarModoUsuario(uid) {
+            try {
+                const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js");
+                const db = getFirestore();
+                
+                const perfilDoc = await getDoc(doc(db, 'medidoso', uid, 'perfil', 'dados'));
+                
+                if (perfilDoc.exists()) {
+                    const perfil = perfilDoc.data();
+                    document.getElementById('nomeUsuario').textContent = perfil.nome;
+                    
+                    if (perfil.cuidadorResponsavel || localStorage.getItem('modoIdoso') === 'true') {
+                        ativarModoIdoso();
+                        isReadOnlyMode = perfil.cuidadorResponsavel ? true : false;
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao configurar modo usuário:', error);
+            }
+        }
+
+        window.toggleModoIdoso = function() {
+            if (isModoIdoso) {
+                desativarModoIdoso();
+            } else {
+                ativarModoIdoso();
+            }
+        }
+
+        function ativarModoIdoso() {
+            document.body.classList.add('modo-idoso');
+            document.getElementById('modoToggle').textContent = 'Modo Normal';
+            isModoIdoso = true;
+            
+            if (isReadOnlyMode) {
+                document.body.classList.add('readonly-mode');
+                document.querySelectorAll('.dia').forEach(dia => {
+                    dia.style.cursor = 'default';
+                    dia.onclick = null;
+                });
+            }
+        }
+
+        function desativarModoIdoso() {
+            document.body.classList.remove('modo-idoso');
+            document.body.classList.remove('readonly-mode');
+            document.getElementById('modoToggle').textContent = 'Modo Idoso';
+            isModoIdoso = false;
+            
+            document.querySelectorAll('.dia').forEach(dia => {
+                dia.style.cursor = 'pointer';
+                dia.onclick = abrirModal;
+            });
+        }
+
+        window.voltarDashboard = function() {
+            localStorage.removeItem('idosoGerenciado');
+            window.location.href = 'dashboard-cuidador.html';
+        }
+
+        const menu = document.getElementById('menu');
+        const menuToggle = document.getElementById('menuToggle');
+
+        // Localize e substitua a função toggleMenu:
+        window.toggleMenu = function() {
+            const menuOverlay = document.getElementById('menuOverlay');
+            
+            if (menu.style.left === '0px') {
+                menu.style.left = '-220px';
+                menuToggle.classList.remove('show');
+                if (menuOverlay) menuOverlay.classList.remove('show');
+            } else {
+                menu.style.left = '0px';
+                menuToggle.classList.add('show');
+                if (menuOverlay) menuOverlay.classList.add('show');
+            }
+        }
+
+        // Atualize também o listener de clique do documento:
+        document.addEventListener('click', (event) => {
+            const isClickInsideMenu = menu.contains(event.target);
+            const isClickInsideButton = document.querySelector('.button-container').contains(event.target);
+            const isMenuOpen = menu.style.left === '0px';
+            const menuOverlay = document.getElementById('menuOverlay');
+
+            if (!isClickInsideMenu && !isClickInsideButton && isMenuOpen) {
+                menu.style.left = '-220px';
+                menuToggle.classList.remove('show');
+                if (menuOverlay) menuOverlay.classList.remove('show');
+            }
+        });
+
+        window.sair = function() {
+            var popup = document.getElementById('popupDesconectando');
+            if (popup) popup.style.display = 'block';
+        }
+
+        const hoje = new Date();
+
+        function gerarDatasDaSemana() {
+            const dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            const dataDaSemana = [];
+
+            for (let i = 0; i < 7; i++) {
+                const data = new Date(hoje);
+                data.setDate(hoje.getDate() + (i - hoje.getDay() + 1) % 7);
+                dataDaSemana.push(data.toLocaleDateString('pt-BR'));
+            }
+
+            dias.forEach((dia, index) => {
+                document.getElementById(`data-${dia}`).innerText = dataDaSemana[index];
+            });
+        }
+
+        window.abrirModal = function() {
+            if (!isReadOnlyMode) {
+                document.getElementById('modal').style.display = 'flex';
+            }
+        }
+
+        window.fecharModal = function() {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('form-remedio').reset();
+            document.getElementById('imagem-preview').style.display = 'none';
+        }
+
+        window.mostrarImagem = function(event) {
+            const imagemPreview = document.getElementById('imagem-preview');
+            const arquivo = event.target.files[0];
+
+            if (arquivo) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagemPreview.src = e.target.result;
+                    imagemPreview.style.display = 'block';
+                }
+                reader.readAsDataURL(arquivo);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('form-remedio').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                if (isReadOnlyMode) return;
+                
+                const remedio = document.getElementById('remedio').value;
+                const horario = document.getElementById('horario').value;
+                const observacoes = document.getElementById('observacoes').value;
+                const imagemPreview = document.getElementById('imagem-preview').src;
+                const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+                const diasSelecionados = [];
+
+                checkboxes.forEach((checkbox, index) => {
+                    if (checkbox.checked) {
+                        diasSelecionados.push(index);
+                        checkbox.checked = false;
+                    }
+                });
+
+                for (const dia of diasSelecionados) {
+                    const diaNome = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'][dia];
+                    const remedioData = {
+                        nome: remedio,
+                        horario: horario,
+                        observacoes: observacoes,
+                        imagem: imagemPreview !== window.location.href ? imagemPreview : ''
+                    };
+
+                    try {
+                        await adicionarRemedioFirestore(userId, diaNome, remedioData);
+                        adicionarRemedioNaInterface(diaNome, remedioData);
+                    } catch (error) {
+                        console.error("Erro ao adicionar medicamento:", error);
+                    }
+                }
+
+                document.getElementById('form-remedio').reset();
+                fecharModal();
+            });
+        });
+
+        function adicionarRemedioNaInterface(diaNome, remedioData) {
+            const lista = document.getElementById(`lista-${diaNome}`);
+            const li = document.createElement('li');
+
+            const horarioDiv = document.createElement('div');
+            horarioDiv.className = 'horario-medicamento';
+            horarioDiv.innerHTML = `<i class="fas fa-clock"></i> ${remedioData.horario}`;
+            li.appendChild(horarioDiv);
+
+            const nomeDiv = document.createElement('div');
+            nomeDiv.className = 'nome-medicamento';
+            nomeDiv.innerHTML = `<i class="fas fa-pills"></i> ${remedioData.nome}`;
+            li.appendChild(nomeDiv);
+
+            if (remedioData.observacoes) {
+                const observacaoDiv = document.createElement('div');
+                observacaoDiv.className = 'observacoes-medicamento';
+                observacaoDiv.innerHTML = `<i class="fas fa-sticky-note"></i> <span>${remedioData.observacoes}</span>`;
+                li.appendChild(observacaoDiv);
+            }
+
+            li.dataset.horario = remedioData.horario;
+
+            if (remedioData.imagem) {
+                const img = document.createElement('img');
+                img.src = remedioData.imagem;
+                img.className = 'img-preview';
+                img.title = 'Clique para ampliar';
+                img.onclick = function() {
+                    window.open(remedioData.imagem, '_blank');
+                };
+                li.appendChild(img);
+            }
+
+            if (!isReadOnlyMode) {
+                const removeButton = document.createElement('button');
+                removeButton.innerHTML = '<i class="fas fa-times"></i>';
+                removeButton.className = 'remove-button';
+                removeButton.title = 'Remover medicamento';
+                removeButton.onclick = async function(event) {
+                    event.stopPropagation();
+                    if (confirm(`Deseja remover o medicamento "${remedioData.nome}"?`)) {
+                        try {
+                            await removerRemedioFirestore(userId, diaNome, remedioData.horario, remedioData.nome);
+                            lista.removeChild(li);
+                        } catch (error) {
+                            console.error('Erro ao remover medicamento:', error);
+                            alert('Erro ao remover medicamento. Tente novamente.');
+                        }
+                    }
+                };
+                li.appendChild(removeButton);
+            }
+
+            lista.appendChild(li);
+
+            const itens = Array.from(lista.children);
+            itens.sort((a, b) => a.dataset.horario.localeCompare(b.dataset.horario));
+            lista.innerHTML = '';
+            itens.forEach(item => lista.appendChild(item));
+        }
+
+        window.baixarAgenda = function() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            
+            const dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            const colunas = [10, 60, 150];
+            let y = 10;
+
+            pdf.setFontSize(16);
+            pdf.text('Agenda de Medicamentos', 10, y);
+            y += 10;
+            
+            dias.forEach((dia) => {
+                const lista = document.getElementById(`lista-${dia}`);
+                const items = lista.getElementsByTagName('li');
+                                                        
+                pdf.setFontSize(14);
+                pdf.setTextColor(255,0,0);
+                pdf.text(dia.charAt(0).toUpperCase() + dia.slice(1) + ':', 10, y);
+                
+                y += 7;
+
+                pdf.setFontSize(14);
+                pdf.setTextColor(0,0,0);
+                
+                for (let item of items) {
+                    if (y > pdf.internal.pageSize.height - 15) {
+                        pdf.addPage();
+                        y = 10;
+                    }
+                                            
+                    const text = item.innerText.replace('×', '').trim();
+                    const [medicamento, ...resto] = text.split(' - ');
+                    const observacoes = resto.join(' - ');
+                    const imagem = item.querySelector('.img-preview');
+                    
+                    pdf.text(medicamento, colunas[0], y);
+                    pdf.text(observacoes, colunas[1], y);
+                    
+                    if (imagem) {
+                        pdf.addImage(imagem.src, colunas[2], y - 8, 20, 20);
+                    }
+                    
+                    y += 14;
+                    pdf.line(colunas[0], y, 200, y); 
+                    y += 10;
+                }
+                y += 4;
+            });
+            
+            pdf.save('agenda.pdf');
+        }
+    </script>
+</body>
+</html>
