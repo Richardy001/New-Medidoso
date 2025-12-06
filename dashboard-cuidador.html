@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -215,6 +216,15 @@
             background: #1e7e34;
         }
 
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
         .empty-state {
             text-align: center;
             padding: 40px;
@@ -284,6 +294,23 @@
         .logout-btn:hover {
             background: #c82333;
         }
+
+        /* Botão grande de adicionar medicamento no dashboard */
+        .btn-add-med-dashboard {
+            background: linear-gradient(135deg,#28a745 0%, #1e7e34 100%);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(40,167,69,0.2);
+            transition: transform .12s ease, box-shadow .12s ease;
+            margin-left: 12px;
+        }
+
+        .btn-add-med-dashboard:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(40,167,69,0.28); }
     </style>
 </head>
 <body>
@@ -295,6 +322,7 @@
         <div class="user-info">
             <span id="nomeUsuario">Carregando...</span>
             <div class="user-avatar" id="avatarUsuario">C</div>
+            <button id="btnAddMedDashboard" class="btn-add-med-dashboard" onclick="abrirAdicionarMedicamento()" style="display:none;">+ Adicionar Medicamento</button>
             <button class="logout-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i> Sair
             </button>
@@ -356,30 +384,36 @@
         </div>
     </div>
 
-    <!-- Modal Novo Idoso -->
+    <!-- Modal para selecionar idoso antes de abrir agenda para adicionar medicamento -->
+    <div class="modal" id="modalSelecionarIdosoMedic">
+        <div class="modal-content">
+            <h3>Adicionar Medicamento - Selecionar Paciente</h3>
+            <div class="form-group">
+                <label for="selectIdosoParaMedic">Selecione o paciente</label>
+                <select id="selectIdosoParaMedic" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd"></select>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:12px;">
+                <button class="btn" type="button" onclick="fecharModalSelecionarIdosoMedic()">Cancelar</button>
+                <button class="btn btn-success" id="btnConfirmarSelecionarIdoso">Abrir Agenda</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Selecionar Idoso Existente -->
     <div class="modal" id="modalNovoIdoso">
         <div class="modal-content">
-            <h3>Adicionar Novo Paciente</h3>
+            <h3>Adicionar Paciente Existente</h3>
             <form id="formNovoIdoso">
                 <div class="form-group">
-                    <label>Nome Completo</label>
-                    <input type="text" id="nomeIdoso" required>
+                    <label for="selectIdosoExistente">Selecione um paciente já cadastrado</label>
+                    <select id="selectIdosoExistente" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd">
+                        <option value="">Carregando pacientes...</option>
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label>Idade</label>
-                    <input type="number" id="idadeIdoso" min="1" max="120">
-                </div>
-                <div class="form-group">
-                    <label>Relação</label>
-                    <input type="text" id="relacaoIdoso" placeholder="Ex: Mãe, Pai, Paciente">
-                </div>
-                <div class="form-group">
-                    <label>Observações</label>
-                    <input type="text" id="obsIdoso" placeholder="Informações adicionais">
-                </div>
+                <div id="infoSemPacientes" style="display:none; color:#666; margin-bottom:10px;">Nenhum paciente cadastrado disponível para adicionar.</div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                     <button type="button" class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Adicionar</button>
+                    <button type="submit" class="btn btn-success" id="btnAdicionarExistente">Adicionar</button>
                 </div>
             </form>
         </div>
@@ -388,7 +422,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, collection, getDocs, collectionGroup } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCMQtt7KP30AcHi72FHtaZtZOXIYL7DVv0",
@@ -510,6 +544,9 @@
                                     <button class="btn btn-success" onclick="verRelatorio('${idoso.id}')">
                                         <i class="fas fa-chart-line"></i> Relatório
                                     </button>
+                                    <button class="btn btn-danger" onclick="removerIdoso('${idoso.id}')">
+                                        <i class="fas fa-trash"></i> Remover
+                                    </button>
                                 </div>
                             </div>
                         `;
@@ -523,7 +560,10 @@
         }
 
         window.abrirModalNovoIdoso = function() {
-            document.getElementById('modalNovoIdoso').style.display = 'flex';
+            // Ao abrir modal, buscar pacientes já cadastrados e popular o select
+            buscarPacientesExistentes().then(() => {
+                document.getElementById('modalNovoIdoso').style.display = 'flex';
+            });
         }
 
         window.fecharModal = function() {
@@ -537,9 +577,99 @@
             window.location.href = 'agenda-semanal.html';
         }
 
+        // Abre modal de seleção de idoso para adicionar medicamento
+        window.abrirAdicionarMedicamento = async function() {
+            try {
+                // carregar lista de idosos gerenciados
+                const perfilDoc = await getDoc(doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados'));
+                if (!perfilDoc.exists()) return alert('Perfil do cuidador não encontrado.');
+                const perfil = perfilDoc.data();
+                const idososGerenciados = perfil.idososGerenciados || [];
+
+                const select = document.getElementById('selectIdosoParaMedic');
+                select.innerHTML = '';
+
+                if (idososGerenciados.length === 0) {
+                    alert('Nenhum paciente gerenciado encontrado. Adicione pacientes primeiro.');
+                    return;
+                }
+
+                idososGerenciados.forEach(i => {
+                    const opt = document.createElement('option');
+                    opt.value = i.id;
+                    opt.textContent = i.nome;
+                    select.appendChild(opt);
+                });
+
+                document.getElementById('modalSelecionarIdosoMedic').style.display = 'flex';
+            } catch (error) {
+                console.error('Erro ao abrir seleção de idoso para medicamento:', error);
+                alert('Erro ao abrir seleção. Veja console.');
+            }
+        }
+
+        window.fecharModalSelecionarIdosoMedic = function() {
+            const m = document.getElementById('modalSelecionarIdosoMedic');
+            if (m) m.style.display = 'none';
+        }
+
+        // confirmar seleção: navegar para agenda do idoso selecionado
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('btnConfirmarSelecionarIdoso');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    const select = document.getElementById('selectIdosoParaMedic');
+                    const id = select ? select.value : null;
+                    if (!id) return alert('Selecione um paciente.');
+                    fecharModalSelecionarIdosoMedic();
+                    gerenciarAgenda(id);
+                });
+            }
+        });
+
         window.verRelatorio = function(idosoId) {
             localStorage.setItem('idosoRelatorio', idosoId);
             window.location.href = 'relatorio.html';
+        }
+
+        window.removerIdoso = async function(idosoId) {
+            if (!confirm('Tem certeza que deseja remover este paciente? Esta ação removerá a referência no seu perfil e apagará os dados locais do paciente.')) return;
+            if (!currentUser) {
+                alert('Usuário não autenticado. Atualize a página e tente novamente.');
+                return;
+            }
+
+            try {
+                // 1) Remover referência do cuidador (filtrar por id) - desvincular apenas
+                const perfilCuidadorRef = doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados');
+                const perfilSnap = await getDoc(perfilCuidadorRef);
+                if (perfilSnap.exists()) {
+                    const perfil = perfilSnap.data();
+                    const arr = (perfil.idososGerenciados || []).filter(i => i.id !== idosoId);
+                    await updateDoc(perfilCuidadorRef, { idososGerenciados: arr });
+                }
+
+                // 2) Opcional: limpar o campo cuidadorResponsavel no perfil do idoso se apontar para este cuidador
+                try {
+                    const perfilIdosoRef = doc(db, 'medidoso', idosoId, 'perfil', 'dados');
+                    const perfilIdosoSnap = await getDoc(perfilIdosoRef);
+                    if (perfilIdosoSnap.exists()) {
+                        const dados = perfilIdosoSnap.data();
+                        if (dados.cuidadorResponsavel && dados.cuidadorResponsavel === currentUser.uid) {
+                            // setar para null para indicar desvinculação (não apaga o documento)
+                            await updateDoc(perfilIdosoRef, { cuidadorResponsavel: null });
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Não foi possível atualizar perfil do idoso (cuidadorResponsavel):', err);
+                }
+
+                alert('Paciente desvinculado com sucesso.');
+                await carregarDashboard(currentUser.uid);
+            } catch (error) {
+                console.error('Erro ao remover paciente:', error);
+                alert('Erro ao desvincular paciente: ' + (error.message || error));
+            }
         }
 
         window.verRelatorios = function() {
@@ -554,6 +684,68 @@
             alert('Funcionalidade de ajuda em desenvolvimento');
         }
 
+        // Busca pacientes já cadastrados na raiz 'medidoso/*/perfil/dados' com tipo==='idoso'
+        async function buscarPacientesExistentes() {
+            const select = document.getElementById('selectIdosoExistente');
+            const infoSem = document.getElementById('infoSemPacientes');
+            select.innerHTML = `<option value="">Carregando pacientes...</option>`;
+            infoSem.style.display = 'none';
+
+            try {
+                // Usar collectionGroup para buscar todos os documentos da subcoleção 'perfil' (mais eficiente e direto)
+                const perfilDocs = await getDocs(collectionGroup(db, 'perfil'));
+                const pacientes = [];
+
+                for (const pDoc of perfilDocs.docs) {
+                    try {
+                        // esperamos que o documento de perfil tenha id 'dados'
+                        if (pDoc.id !== 'dados') continue;
+                        const data = pDoc.data();
+                        if (data && data.tipo === 'idoso') {
+                            // obter id do documento pai (medidoso/{idosoId})
+                            const pai = pDoc.ref.parent.parent; // coleção 'perfil' -> documento medidoso/{id}
+                            const idPaciente = pai ? pai.id : null;
+                            if (idPaciente) {
+                                pacientes.push({ id: idPaciente, nome: data.nome || idPaciente, idade: data.idade || null });
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Erro ao processar perfil doc', pDoc.id, err);
+                    }
+                }
+
+                // Remover pacientes que já estejam vinculados ao cuidador
+                let vinculados = [];
+                if (currentUser) {
+                    const perfilCuidadorSnap = await getDoc(doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados'));
+                    if (perfilCuidadorSnap.exists()) {
+                        vinculados = (perfilCuidadorSnap.data().idososGerenciados || []).map(i => i.id);
+                    }
+                }
+
+                const disponiveis = pacientes.filter(p => !vinculados.includes(p.id));
+
+                if (disponiveis.length === 0) {
+                    select.innerHTML = '<option value="">Nenhum paciente disponível</option>';
+                    select.disabled = true;
+                    infoSem.style.display = 'block';
+                    document.getElementById('btnAdicionarExistente').disabled = true;
+                    return;
+                }
+
+                // Preencher select
+                select.disabled = false;
+                select.innerHTML = '<option value="">-- Selecione um paciente --</option>' + disponiveis.map(p => `<option value="${p.id}">${p.nome}${p.idade ? ' • ' + p.idade + ' anos' : ''}</option>`).join('');
+                document.getElementById('btnAdicionarExistente').disabled = false;
+            } catch (error) {
+                console.error('Erro ao buscar pacientes existentes:', error);
+                select.innerHTML = '<option value="">Erro ao carregar pacientes</option>';
+                select.disabled = true;
+                infoSem.style.display = 'block';
+                document.getElementById('btnAdicionarExistente').disabled = true;
+            }
+        }
+
         window.logout = async function() {
             try {
                 await signOut(auth);
@@ -563,57 +755,67 @@
             }
         }
 
-        // Form para adicionar novo idoso
+        // Form para adicionar paciente existente ao cuidador
         document.getElementById('formNovoIdoso').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const nome = document.getElementById('nomeIdoso').value;
-            const idade = document.getElementById('idadeIdoso').value;
-            const relacao = document.getElementById('relacaoIdoso').value;
-            const observacoes = document.getElementById('obsIdoso').value;
-            
+
+            const select = document.getElementById('selectIdosoExistente');
+            const idosoId = select.value;
+
+            if (!idosoId) {
+                alert('Selecione um paciente cadastrado para adicionar.');
+                return;
+            }
+
+            if (!currentUser) {
+                alert('Usuário não autenticado. Atualize a página e tente novamente.');
+                return;
+            }
+
             try {
-                // Gerar ID único para o idoso
-                const idosoId = 'idoso_' + Date.now();
-                
-                // Criar perfil do idoso
-                const idosoData = {
-                    nome: nome,
-                    idade: parseInt(idade) || null,
-                    relacao: relacao,
-                    observacoes: observacoes,
-                    tipo: 'idoso',
-                    cuidadorResponsavel: currentUser.uid,
-                    dataCriacao: new Date().toISOString()
-                };
-                
-                await setDoc(doc(db, 'medidoso', idosoId, 'perfil', 'dados'), idosoData);
-                
-                // Criar agenda inicial para o idoso
-                const diasDaSemana = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
-                for (const dia of diasDaSemana) {
-                    await setDoc(doc(db, 'medidoso', idosoId, 'agenda', dia), { medicamentos: [] });
+                const perfilCuidadorRef = doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados');
+                const perfilSnap = await getDoc(perfilCuidadorRef);
+                let jaVinculado = false;
+                if (perfilSnap.exists()) {
+                    const perfil = perfilSnap.data();
+                    const idososGerenciados = perfil.idososGerenciados || [];
+                    if (idososGerenciados.some(i => i.id === idosoId)) {
+                        jaVinculado = true;
+                    }
                 }
-                
-                // Adicionar idoso à lista do cuidador
-                const perfilCuidador = doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados');
-                await updateDoc(perfilCuidador, {
+
+                if (jaVinculado) {
+                    alert('Este paciente já está vinculado ao seu perfil.');
+                    fecharModal();
+                    return;
+                }
+
+                // Obter dados do paciente selecionado para gravar no array do cuidador
+                const perfilIdosoRef = doc(db, 'medidoso', idosoId, 'perfil', 'dados');
+                const perfilIdosoSnap = await getDoc(perfilIdosoRef);
+                if (!perfilIdosoSnap.exists()) {
+                    alert('Dados do paciente não encontrados.');
+                    return;
+                }
+                const dadosIdoso = perfilIdosoSnap.data();
+
+                // Adicionar referência do idoso ao cuidador
+                await updateDoc(perfilCuidadorRef, {
                     idososGerenciados: arrayUnion({
                         id: idosoId,
-                        nome: nome,
-                        relacao: relacao,
-                        idade: parseInt(idade) || null,
-                        observacoes: observacoes
+                        nome: dadosIdoso.nome || 'Sem nome',
+                        relacao: '',
+                        idade: dadosIdoso.idade || null,
+                        observacoes: dadosIdoso.observacoes || ''
                     })
                 });
-                
-                alert('Paciente adicionado com sucesso!');
+
+                alert('Paciente vinculado com sucesso!');
                 fecharModal();
                 await carregarDashboard(currentUser.uid);
-                
             } catch (error) {
-                console.error('Erro ao adicionar idoso:', error);
-                alert('Erro ao adicionar paciente: ' + error.message);
+                console.error('Erro ao vincular paciente:', error);
+                alert('Erro ao vincular paciente: ' + (error.message || error));
             }
         });
 
