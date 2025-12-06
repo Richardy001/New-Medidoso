@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -57,7 +58,8 @@
 
         input[type="text"],
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="number"] {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -117,6 +119,29 @@
             opacity: 1;
         }
 
+        #errorBanner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            font-weight: 700;
+            font-size: 16px;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #errorBanner.show {
+            display: flex;
+            animation: slideDown 400ms ease forwards;
+        }
+
         /* Campos específicos para cuidador */
         .cuidador-fields {
             display: none;
@@ -140,6 +165,11 @@
             <div class="input-box">
                 <label for="fullName">Nome Completo *</label>
                 <input type="text" id="fullName" required>
+            </div>
+            
+            <div class="input-box" id="idadeField" style="display:none;">
+                <label for="idade">Idade *</label>
+                <input type="number" id="idade" min="0" max="120">
             </div>
             
             <div class="input-box">
@@ -177,6 +207,10 @@
 
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
+    <div id="errorBanner" role="alert">
+        <span id="errorBannerText">Erro inesperado</span>
+        <button class="closeBanner" onclick="hideErrorBanner()">OK</button>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
@@ -193,14 +227,26 @@
             appId: "1:1006734497522:web:98f5911a09c35146bb626b"
         };
 
+        // Inicializa o Firebase com as configurações do projeto
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Verifica o tipo de usuário selecionado e redireciona se necessário
+        document.addEventListener('DOMContentLoaded', function() {
+            const tipoUsuario = localStorage.getItem('tipoUsuario');
+            console.log('cadastro: tipoUsuario =', tipoUsuario);
+            if (!tipoUsuario) {
+                window.location.href = 'registro-tipos.html';
+            }
+        });
+
         // Verificar tipo de usuário selecionado
         document.addEventListener('DOMContentLoaded', function() {
             const tipoUsuario = localStorage.getItem('tipoUsuario');
-            
+
+            console.log('cadastro: tipoUsuario =', tipoUsuario);
+
             if (!tipoUsuario) {
                 // Se não há tipo selecionado, volta para seleção
                 window.location.href = 'registro-tipos.html';
@@ -209,11 +255,24 @@
 
             // Mostra informação do tipo selecionado
             const tipoTexto = document.getElementById('tipo-texto');
+            const idadeField = document.getElementById('idadeField');
+            const idadeInput = document.getElementById('idade');
+
             if (tipoUsuario === 'cuidador') {
                 tipoTexto.textContent = '👩‍⚕️ Conta de Cuidador/Responsável';
                 document.getElementById('cuidadorFields').classList.add('show');
-            } else {
+                if (idadeField) idadeField.style.display = 'none';
+                if (idadeInput) idadeInput.required = false;
+            } else if (tipoUsuario === 'idoso' || tipoUsuario === 'usuario') {
+                // Mostra campo de idade explicitamente para 'idoso' (ou sinônimos)
                 tipoTexto.textContent = '👤 Conta de Usuário';
+                if (idadeField) idadeField.style.display = 'block';
+                if (idadeInput) idadeInput.required = true;
+            } else {
+                // Fallback: mostrar o campo caso o tipo não seja cuidador
+                tipoTexto.textContent = '👤 Conta de Usuário';
+                if (idadeField) idadeField.style.display = 'block';
+                if (idadeInput) idadeInput.required = false;
             }
         });
 
@@ -226,6 +285,43 @@
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 5000);
+        }
+
+        // Banner de erro no topo (mensagens de autenticação/erro importantes)
+        let _errorBannerTimer = null;
+        function showErrorBanner(message, timeout = 6000) {
+            const banner = document.getElementById('errorBanner');
+            const text = document.getElementById('errorBannerText');
+            if (!banner || !text) return;
+            text.textContent = message;
+            banner.classList.add('show');
+            if (_errorBannerTimer) clearTimeout(_errorBannerTimer);
+            _errorBannerTimer = setTimeout(() => {
+                hideErrorBanner();
+            }, timeout);
+        }
+
+        function hideErrorBanner() {
+            const banner = document.getElementById('errorBanner');
+            if (!banner) return;
+            banner.classList.remove('show');
+            setTimeout(() => { if (banner.style.display !== 'none') banner.style.display = 'none'; }, 500);
+        }
+
+        // Mapear alguns códigos de erro do Firebase para mensagens amigáveis
+        function mapAuthErrorToMessage(error) {
+            if (!error) return 'Erro ao efetuar a operação.';
+            const code = error.code || '';
+            switch (code) {
+                case 'auth/email-already-in-use':
+                    return 'E-mail já cadastrado. Faça login ou use outro e-mail.';
+                case 'auth/weak-password':
+                    return 'Senha fraca. Use pelo menos 6 caracteres.';
+                case 'auth/invalid-email':
+                    return 'E-mail inválido. Verifique o formato.';
+                default:
+                    return error.message || 'Erro ao efetuar a operação. Tente novamente.';
+            }
         }
 
         async function criarAgendaInicial(uid) {
@@ -253,18 +349,19 @@
             // Campos específicos para cuidador
             const telefone = document.getElementById('telefone').value;
             // Validar telefone se for cuidador
-            if (tipoUsuario === 'cuidador' && telefone) {
+                if (tipoUsuario === 'cuidador' && telefone) {
                 const telefoneNumeros = telefone.replace(/\D/g, '');
                 if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
-                    showToast('Telefone inválido! Use o formato (00) 00000-0000', true);
+                    showErrorBanner('Telefone inválido! Use o formato (00) 00000-0000');
                     return;
                 }
             }
 
             const profissao = document.getElementById('profissao').value;
+            const idade = document.getElementById('idade') ? document.getElementById('idade').value : '';
 
             try {
-                // Criar usuário no Firebase Auth
+                // Criar usuário no Firebase
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const uid = userCredential.user.uid;
 
@@ -280,7 +377,17 @@
                 if (tipoUsuario === 'cuidador') {
                     perfilData.telefone = telefone;
                     perfilData.profissao = profissao;
-                    perfilData.idososGerenciados = []; // Lista vazia inicial
+                    perfilData.idososGerenciados = [];
+                }
+
+                // Se for usuário (idoso), salvar a idade quando informada
+                if (tipoUsuario !== 'cuidador' && idade) {
+                    const idadeNum = Number(idade);
+                    if (!Number.isFinite(idadeNum) || idadeNum < 0 || idadeNum > 120) {
+                        showErrorBanner('Informe uma idade válida (0-120).');
+                        return;
+                    }
+                    perfilData.idade = idadeNum;
                 }
 
                 // Salvar perfil
@@ -291,9 +398,15 @@
 
                 showToast("Conta criada com sucesso!");
                 
-                // Limpar localStorage
-                localStorage.removeItem('tipoUsuario');
-                
+                // Limpar localStorage e formulário para evitar reaproveitamento de estado
+                try { localStorage.removeItem('tipoUsuario'); } catch(e) {}
+                try { localStorage.removeItem('idosoGerenciado'); } catch(e) {}
+                try { localStorage.removeItem('modoIdoso'); } catch(e) {}
+                try { localStorage.removeItem('idosoRelatorio'); } catch(e) {}
+
+                const form = document.getElementById('createAccountForm');
+                if (form) form.reset();
+
                 // Redirecionar baseado no tipo de usuário
                 setTimeout(() => {
                     if (tipoUsuario === 'cuidador') {
@@ -301,11 +414,12 @@
                     } else {
                         window.location.href = 'agenda-semanal.html';
                     }
-                }, 2000);
+                }, 1000);
 
             } catch (error) {
                 console.error("Erro ao criar conta:", error);
-                showToast("Erro: " + error.message, true);
+                const friendly = mapAuthErrorToMessage(error);
+                showErrorBanner(friendly);
             }
         });
 
