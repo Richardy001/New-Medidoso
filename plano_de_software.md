@@ -10,7 +10,6 @@ O **Plano de Software** (PS) tem como propósito organizar e orientar o desenvol
   - Gustavo dos Santos Alves
   - Guilherme Garghetti
   - Richardy Zaparolli
-  - Diogo Felipe Alves
 
 * **Repositório Git:** (https://github.com/Richardy001/New-Medidoso)
 * **Data de início:** 18 de agosto de 2025
@@ -123,7 +122,7 @@ Integração com dispositivos de IoT (caixas de remédio inteligentes, smartwatc
   - Validar usabilidade junto ao público-alvo (idosos).
   - Apoiar na documentação técnica e evidências.
 
-- **Desempenhado por:** Diogo Felipe Alves
+- **Desempenhado por:** Guilherme Garghetti
 - **Principais atribuições:**
   - Criar protótipos e fluxos de navegação.
   - Realizar pesquisas rápidas de acessibilidade.
@@ -154,7 +153,7 @@ A equipe foi organizada em dois subgrupos principais:
 
 #### Distribuição de tarefas
   - As tarefas são registradas e priorizadas no GitHub Projects. Cada atividade é atribuída a um membro de acordo com o papel definido no RACI:
-    - Backend (Gustavo Santos Alves), Frontend (Guilherme Garghetti), QA (Richardy Zaparolli), UX (Diogo), Gerência (Gustavo Zanella).
+    - Backend (Gustavo Santos Alves), Frontend (Guilherme Garghetti), QA (Richardy Zaparolli), UX (Guilherme Garghetti), Gerência (Gustavo Zanella).
     - O Gerente revisa a priorização semanalmente.
 
 #### Documentação e rastreabilidade
