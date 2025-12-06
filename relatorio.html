@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - MEDIDOSO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .report-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .medicamentos-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .medicamentos-table th,
+        .medicamentos-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .medicamentos-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .medicamentos-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .frequency-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .freq-alta {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .freq-media {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .freq-baixa {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #545b62;
+        }
+
+        .export-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="logo-medidoso.jpeg" alt="Logo">
+            <h3>MEDIDOSO - Relatórios</h3>
+        </div>
+        <div class="user-info">
+            <span id="nomeUsuario">Carregando...</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <a href="#" class="back-btn" onclick="voltarDashboard()">
+            <i class="fas fa-arrow-left"></i>
+            Voltar ao Dashboard
+        </a>
+
+        <div class="page-title">
+            <h1>Relatórios de Medicamentos</h1>
+            <p>Análise detalhada dos medicamentos cadastrados</p>
+        </div>
+
+        <div class="filters-section">
+            <h3>Filtros</h3>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Paciente</label>
+                    <select id="filtro-paciente">
+                        <option value="">Todos os pacientes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Período</label>
+                    <select id="filtro-periodo">
+                        <option value="7">Últimos 7 dias</option>
+                        <option value="30">Últimos 30 dias</option>
+                        <option value="90">Últimos 90 dias</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-primary" onclick="gerarRelatorio()">
+                        <i class="fas fa-chart-bar"></i> Gerar Relatório
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-medicamentos">0</div>
+                <div class="stat-label">Total de Medicamentos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="medicamentos-ativos">0</div>
+                <div class="stat-label">Medicamentos Ativos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="media-por-dia">0</div>
+                <div class="stat-label">Média por Dia</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pacientes-cadastrados">0</div>
+                <div class="stat-label">Pacientes Cadastrados</div>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h2>Medicamentos por Frequência</h2>
+            <div id="medicamentos-lista">
+                <div class="empty-state">
+                    <i class="fas fa-pills"></i>
+                    <h3>Carregando relatório...</h3>
+                    <p>Analisando medicamentos cadastrados</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h2>Distribuição por Dias da Semana</h2>
+            <div id="distribuicao-dias">
+                <div class="empty-state">
+                    <i class="fas fa-calendar"></i>
+                    <h3>Analisando distribuição...</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <button class="btn btn-primary" onclick="exportarRelatorio()">
+                <i class="fas fa-download"></i> Exportar Relatório PDF
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMQtt7KP30AcHi72FHtaZtZOXIYL7DVv0",
+            authDomain: "medidoso.firebaseapp.com",
+            databaseURL: "https://medidoso-default-rtdb.firebaseio.com",
+            projectId: "medidoso",
+            storageBucket: "medidoso.appspot.com",
+            messagingSenderId: "1006734497522",
+            appId: "1:1006734497522:web:98f5911a09c35146bb626b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let dadosRelatorio = {
+            medicamentos: [],
+            pacientes: [],
+            estatisticas: {}
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await carregarDadosUsuario(user.uid);
+                await carregarDadosRelatorio(user.uid);
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        async function carregarDadosUsuario(uid) {
+            try {
+                const perfilDoc = await getDoc(doc(db, 'medidoso', uid, 'perfil', 'dados'));
+                if (perfilDoc.exists()) {
+                    const perfil = perfilDoc.data();
+                    document.getElementById('nomeUsuario').textContent = perfil.nome;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados do usuário:', error);
+            }
+        }
+
+        async function carregarDadosRelatorio(uid) {
+            try {
+                const perfilDoc = await getDoc(doc(db, 'medidoso', uid, 'perfil', 'dados'));
+                
+                if (perfilDoc.exists()) {
+                    const perfil = perfilDoc.data();
+                    
+                    if (perfil.tipo === 'cuidador') {
+                        // Carregar dados de todos os idosos gerenciados
+                        await carregarDadosCuidador(perfil);
+                    } else {
+                        // Carregar dados do próprio usuário
+                        await carregarDadosUsuarioUnico(uid, perfil.nome);
+                    }
+                }
+                
+                await gerarRelatorio();
+            } catch (error) {
+                console.error('Erro ao carregar dados do relatório:', error);
+            }
+        }
+
+        async function carregarDadosCuidador(perfil) {
+            const idososGerenciados = perfil.idososGerenciados || [];
+            
+            // Preencher select de pacientes
+            const selectPaciente = document.getElementById('filtro-paciente');
+            selectPaciente.innerHTML = '<option value="">Todos os pacientes</option>';
+            
+            for (const idoso of idososGerenciados) {
+                const option = document.createElement('option');
+                option.value = idoso.id;
+                option.textContent = idoso.nome;
+                selectPaciente.appendChild(option);
+                
+                dadosRelatorio.pacientes.push({
+                    id: idoso.id,
+                    nome: idoso.nome,
+                    relacao: idoso.relacao
+                });
+                
+                // Carregar medicamentos do idoso
+                await carregarMedicamentosIdoso(idoso.id, idoso.nome);
+            }
+        }
+
+        async function carregarDadosUsuarioUnico(uid, nome) {
+            dadosRelatorio.pacientes.push({
+                id: uid,
+                nome: nome,
+                relacao: 'Próprio usuário'
+            });
+            
+            await carregarMedicamentosIdoso(uid, nome);
+        }
+
+        async function carregarMedicamentosIdoso(idosoId, nomeIdoso) {
+            try {
+                const agendaSnapshot = await getDocs(collection(db, 'medidoso', idosoId, 'agenda'));
+                
+                agendaSnapshot.forEach(doc => {
+                    const dia = doc.id;
+                    const dados = doc.data();
+                    const medicamentos = dados.medicamentos || [];
+                    
+                    medicamentos.forEach(med => {
+                        dadosRelatorio.medicamentos.push({
+                            nome: med.nome,
+                            horario: med.horario,
+                            observacoes: med.observacoes || '',
+                            dia: dia,
+                            paciente: nomeIdoso,
+                            pacienteId: idosoId
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error(`Erro ao carregar medicamentos de ${nomeIdoso}:`, error);
+            }
+        }
+
+        window.gerarRelatorio = async function() {
+            const pacienteFiltro = document.getElementById('filtro-paciente').value;
+            
+            // Filtrar medicamentos
+            let medicamentosFiltrados = dadosRelatorio.medicamentos;
+            
+            if (pacienteFiltro) {
+                medicamentosFiltrados = dadosRelatorio.medicamentos.filter(
+                    med => med.pacienteId === pacienteFiltro
+                );
+            }
+            
+            // Calcular estatísticas
+            calcularEstatisticas(medicamentosFiltrados);
+            
+            // Gerar tabela de medicamentos
+            gerarTabelaMedicamentos(medicamentosFiltrados);
+            
+            // Gerar distribuição por dias
+            gerarDistribuicaoDias(medicamentosFiltrados);
+        }
+
+        function calcularEstatisticas(medicamentos) {
+            const totalMedicamentos = medicamentos.length;
+            const medicamentosUnicos = [...new Set(medicamentos.map(m => m.nome))];
+            const pacientesUnicos = [...new Set(medicamentos.map(m => m.pacienteId))];
+            
+            // Agrupar por dias da semana
+            const medicamentosPorDia = {};
+            const dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            
+            dias.forEach(dia => {
+                medicamentosPorDia[dia] = medicamentos.filter(m => m.dia === dia).length;
+            });
+            
+            const mediaPorDia = totalMedicamentos / 7;
+            
+            // Atualizar interface
+            document.getElementById('total-medicamentos').textContent = totalMedicamentos;
+            document.getElementById('medicamentos-ativos').textContent = medicamentosUnicos.length;
+            document.getElementById('media-por-dia').textContent = mediaPorDia.toFixed(1);
+            document.getElementById('pacientes-cadastrados').textContent = pacientesUnicos.length;
+        }
+
+        function gerarTabelaMedicamentos(medicamentos) {
+            const container = document.getElementById('medicamentos-lista');
+            
+            if (medicamentos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-pills"></i>
+                        <h3>Nenhum medicamento encontrado</h3>
+                        <p>Não há medicamentos cadastrados para os filtros selecionados</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Agrupar medicamentos por nome e contar frequência
+            const medicamentosAgrupados = {};
+            
+            medicamentos.forEach(med => {
+                if (!medicamentosAgrupados[med.nome]) {
+                    medicamentosAgrupados[med.nome] = {
+                        nome: med.nome,
+                        ocorrencias: 0,
+                        dias: new Set(),
+                        pacientes: new Set(),
+                        horarios: new Set()
+                    };
+                }
+                
+                medicamentosAgrupados[med.nome].ocorrencias++;
+                medicamentosAgrupados[med.nome].dias.add(med.dia);
+                medicamentosAgrupados[med.nome].pacientes.add(med.paciente);
+                medicamentosAgrupados[med.nome].horarios.add(med.horario);
+            });
+            
+            // Converter para array e ordenar por frequência
+            const medicamentosOrdenados = Object.values(medicamentosAgrupados)
+                .sort((a, b) => b.ocorrencias - a.ocorrencias);
+            
+            let html = `
+                <table class="medicamentos-table">
+                    <thead>
+                        <tr>
+                            <th>Medicamento</th>
+                            <th>Frequência</th>
+                            <th>Dias da Semana</th>
+                            <th>Pacientes</th>
+                            <th>Horários</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            medicamentosOrdenados.forEach(med => {
+                const frequenciaClass = med.ocorrencias >= 5 ? 'freq-alta' : 
+                                      med.ocorrencias >= 3 ? 'freq-media' : 'freq-baixa';
+                
+                const diasTexto = Array.from(med.dias).join(', ');
+                const pacientesTexto = Array.from(med.pacientes).join(', ');
+                const horariosTexto = Array.from(med.horarios).sort().join(', ');
+                
+                html += `
+                    <tr>
+                        <td><strong>${med.nome}</strong></td>
+                        <td>
+                            <span class="frequency-badge ${frequenciaClass}">
+                                ${med.ocorrencias}x
+                            </span>
+                        </td>
+                        <td>${diasTexto}</td>
+                        <td>${pacientesTexto}</td>
+                        <td>${horariosTexto}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function gerarDistribuicaoDias(medicamentos) {
+            const container = document.getElementById('distribuicao-dias');
+            
+            const dias = {
+                'segunda': 'Segunda-feira',
+                'terca': 'Terça-feira', 
+                'quarta': 'Quarta-feira',
+                'quinta': 'Quinta-feira',
+                'sexta': 'Sexta-feira',
+                'sabado': 'Sábado',
+                'domingo': 'Domingo'
+            };
+            
+            const distribuicao = {};
+            Object.keys(dias).forEach(dia => {
+                distribuicao[dia] = medicamentos.filter(m => m.dia === dia).length;
+            });
+            
+            let html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+            `;
+            
+            Object.entries(distribuicao).forEach(([dia, quantidade]) => {
+                const porcentagem = medicamentos.length > 0 ? 
+                    (quantidade / medicamentos.length * 100).toFixed(1) : 0;
+                
+                html += `
+                    <div class="stat-card">
+                        <div class="stat-number">${quantidade}</div>
+                        <div class="stat-label">${dias[dia]}</div>
+                        <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                            ${porcentagem}%
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        window.voltarDashboard = function() {
+            const tipoUsuario = dadosRelatorio.pacientes.length > 1 ? 'cuidador' : 'usuario';
+            
+            if (tipoUsuario === 'cuidador') {
+                window.location.href = 'dashboard-cuidador.html';
+            } else {
+                window.location.href = 'agenda-semanal.html';
+            }
+        }
+
+        window.exportarRelatorio = function() {
+            // Implementação básica de exportação
+            const dadosExport = {
+                dataGeracao: new Date().toLocaleDateString('pt-BR'),
+                totalMedicamentos: document.getElementById('total-medicamentos').textContent,
+                medicamentosAtivos: document.getElementById('medicamentos-ativos').textContent,
+                mediaPorDia: document.getElementById('media-por-dia').textContent,
+                pacientes: document.getElementById('pacientes-cadastrados').textContent
+            };
+            
+            const conteudo = `
+Relatório MEDIDOSO
+Gerado em: ${dadosExport.dataGeracao}
+
+ESTATÍSTICAS GERAIS:
+- Total de Medicamentos: ${dadosExport.totalMedicamentos}
+- Medicamentos Únicos: ${dadosExport.medicamentosAtivos}
+- Média por Dia: ${dadosExport.mediaPorDia}
+- Pacientes: ${dadosExport.pacientes}
+
+MEDICAMENTOS CADASTRADOS:
+${dadosRelatorio.medicamentos.map(m => 
+    `- ${m.nome} (${m.horario}) - ${m.paciente} - ${m.dia}`
+).join('\n')}
+            `;
+            
+            const blob = new Blob([conteudo], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `relatorio-medidoso-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1367 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Semanal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* MODO IDOSO - Interface Adaptada */
+        .modo-idoso {
+            font-size: 22px !important;
+            line-height: 1.6;
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        .modo-idoso .container {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        .modo-idoso .agenda {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: 1fr 1fr;
+            gap: 15px !important;
+        }
+
+        .modo-idoso .dia {
+            padding: 25px !important;
+            border: 3px solid #333 !important;
+            background-color: #f8f9fa !important;
+        }
+
+        .modo-idoso .dia h2 {
+            font-size: 26px !important;
+            font-weight: bold !important;
+            color: #000 !important;
+        }
+
+        .modo-idoso button {
+            min-height: 50px !important;
+            font-size: 20px !important;
+            font-weight: bold !important;
+            padding: 15px 20px !important;
+        }
+
+        .modo-idoso ul li {
+            font-size: 20px !important;
+            padding: 20px !important;
+            margin: 15px 0 !important;
+            border-left-width: 6px !important;
+        }
+
+        .modo-idoso ul li .horario-medicamento {
+            font-size: 22px !important;
+        }
+
+        .modo-idoso ul li .nome-medicamento {
+            font-size: 20px !important;
+        }
+
+        .modo-idoso ul li .observacoes-medicamento {
+            font-size: 18px !important;
+        }
+
+        .modo-idoso .data {
+            font-size: 18px !important;
+            padding: 8px 12px !important;
+            background-color: #007bff !important;
+            color: white !important;
+            font-weight: bold !important;
+        }
+
+        /* Estilo Normal */
+        .container {
+            padding: 50px;
+            max-width: 2000px;
+            margin: 0 auto;
+            background-color: #5eb4e8;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            /* permitir que o container cresça além da viewport para que a página inteira role */
+            min-height: 100vh;
+            position: relative;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 25px;
+            color: white;
+        }
+
+        .modo-toggle {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 4999;
+        }
+
+        .menu-overlay.show {
+            display: block;
+        }
+
+        .menu {
+            width: 220px;
+            background-color: #fec364;
+            color: white;
+            padding: 80px 15px 20px 15px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            left: -270px;
+            height: 100vh;
+            transition: left 0.3s ease;
+            z-index: 5000;
+            overflow-y: auto;
+        }
+
+        .menu.open {
+            left: 0;
+        }
+
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu li {
+            margin: 10px 0;
+        }
+
+        .menu a {
+            color: #333333;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .menu a:hover {
+            background-color: #f0ae45;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .agenda {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            /* deixar a grade crescer naturalmente para que a página role inteira */
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .dia {
+            flex: none;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            position: relative;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .dia h2 {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 8px;
+            margin-top: 25px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 5px;
+            flex-grow: 1;
+            text-align: left;
+            width: 100%;
+            /* permitir que cada lista cresça e a página role inteira */
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        ul li {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin-bottom: 10px;
+            padding: 12px;
+            padding-right: 40px;
+            border-radius: 10px;
+            border-left: 3px solid #FEC364;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        ul li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-left-color: #f0ae45;
+        }
+
+        ul li .horario-medicamento {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #2c3e50;
+            flex-wrap: wrap;
+        }
+
+        ul li .horario-medicamento i {
+            color: #FEC364;
+        }
+
+        ul li .nome-medicamento {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #34495e;
+            font-weight: 600;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        ul li .nome-medicamento i {
+            color: #3498db;
+        }
+
+        ul li .observacoes-medicamento {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            font-size: 11px;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 6px;
+            background: rgba(254, 195, 100, 0.1);
+            border-radius: 5px;
+            margin-top: 4px;
+            word-break: break-word;
+        }
+
+        ul li .observacoes-medicamento i {
+            color: #f39c12;
+            margin-top: 2px;
+        }
+
+        .img-preview {
+            margin-top: 8px;
+            max-width: 70px;
+            max-height: 70px;
+            border-radius: 6px;
+            border: 2px solid #ecf0f1;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .img-preview:hover {
+            transform: scale(1.1);
+        }
+
+        .remove-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+        }
+
+        .remove-button:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.5);
+        }
+
+        .remove-button:active {
+            transform: rotate(90deg) scale(0.95);
+        }
+
+        .edit-button {
+            position: absolute;
+            top: 8px;
+            right: 44px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(41, 128, 185, 0.25);
+        }
+
+        .edit-button:hover {
+            transform: scale(1.05);
+        }
+
+        ul:empty::before {
+            content: "Nenhum medicamento cadastrado";
+            display: block;
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+            padding: 30px;
+        }
+
+        .data {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            background-color: #fec364;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 375px;
+        }
+
+        .close {
+            cursor: pointer;
+            color: #007bff;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        input[type="time"],
+        textarea,
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #fec364;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #f0ae45;
+        }
+
+        .checkbox-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .download-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .menu-toggle {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 5001;
+            cursor: pointer;
+            gap: 6px;
+        }
+
+        .menu-toggle div {
+            width: 30px;
+            height: 3px;
+            background-color: #333;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .menu-toggle:hover div {
+            background-color: #fec364;
+        }
+
+        .readonly-mode .dia {
+            cursor: default !important;
+        }
+
+        /* Botão de adicionar do cuidador */
+        .btn-add-cuidador {
+            display: none;
+            margin-left: 12px;
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 6px 18px rgba(40,167,69,0.25);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .btn-add-cuidador:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(40,167,69,0.32);
+        }
+
+        .btn-add-cuidador:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 16px rgba(40,167,69,0.22);
+        }
+
+        .readonly-mode .modal {
+            display: none !important;
+        }
+
+        .cuidador-info {
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-left: auto;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .agenda {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .dia {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <div class="menu" id="menu">
+        <ul>
+            <li><a href="editUser.html">Perfil</a></li>
+            <li id="menuDashboardItem"><a href="#" onclick="voltarDashboard()">Dashboard</a></li>
+            <li><a href="index.html" onclick="sair()">Sair</a></li>
+        </ul>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+    <div class="container">
+        <div class="controls-bar">
+            <div class="user-info" id="userInfo">
+                <i class="fas fa-user"></i>
+                <span id="nomeUsuario">Carregando...</span>
+            </div>
+
+            <button id="btnAddCuidador" class="btn-add-cuidador" title="Adicionar medicamento">+ Adicionar Medicamento</button>
+
+            <h1>Agenda de Medicamentos</h1>
+
+                <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="modo-toggle" id="modoToggle" onclick="toggleModoIdoso()" style="display: none;">
+                    Modo Idoso
+                </button>
+                <button id="btnAdicionar" class="download-button" onclick="abrirModal()" style="display: none; margin-right:8px;">Adicionar</button>
+                <button class="download-button" onclick="baixarAgenda()">Baixar Agenda</button>
+            </div>
+        </div>
+
+        <div class="cuidador-info" id="cuidadorInfo" style="display: none;">
+            <i class="fas fa-info-circle"></i>
+            <span>Gerenciando medicamentos de: <strong id="nomePaciente"></strong></span>
+        </div>
+
+        <div class="agenda" id="agenda">
+            <div class="dia">
+                <h2>Segunda-feira</h2>
+                <span class="data" id="data-segunda"></span>
+                <ul id="lista-segunda"></ul>
+            </div>
+            <div class="dia">
+                <h2>Terça-feira</h2>
+                <span class="data" id="data-terca"></span>
+                <ul id="lista-terca"></ul>
+            </div>
+            <div class="dia">
+                <h2>Quarta-feira</h2>
+                <span class="data" id="data-quarta"></span>
+                <ul id="lista-quarta"></ul>
+            </div>
+            <div class="dia">
+                <h2>Quinta-feira</h2>
+                <span class="data" id="data-quinta"></span>
+                <ul id="lista-quinta"></ul>
+            </div>
+            <div class="dia">
+                <h2>Sexta-feira</h2>
+                <span class="data" id="data-sexta"></span>
+                <ul id="lista-sexta"></ul>
+            </div>
+            <div class="dia">
+                <h2>Sábado</h2>
+                <span class="data" id="data-sabado"></span>
+                <ul id="lista-sabado"></ul>
+            </div>
+            <div class="dia">
+                <h2>Domingo</h2>
+                <span class="data" id="data-domingo"></span>
+                <ul id="lista-domingo"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2>Adicionar Medicamento</h2>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="check-segunda">Seg</label>
+                <label><input type="checkbox" id="check-terca">Ter</label>
+                <label><input type="checkbox" id="check-quarta">Qua</label>
+                <label><input type="checkbox" id="check-quinta">Qui</label>
+                <label><input type="checkbox" id="check-sexta">Sex</label>
+                <label><input type="checkbox" id="check-sabado">Sáb</label>
+                <label><input type="checkbox" id="check-domingo">Dom</label>
+            </div>
+            <form id="form-remedio">
+                <input type="text" id="remedio" placeholder="Nome do medicamento" required>
+                <input type="time" id="horario" placeholder="Horário" required>
+                <textarea id="observacoes" rows="3" placeholder="Observações" style="text-align: center;"></textarea>
+                <input type="file" id="imagem" accept="image/*" onchange="mostrarImagem(event)">
+                <img id="imagem-preview" class="img-preview" style="display:none;">
+                <button type="submit">Adicionar Medicamento</button>
+                <div class="close" onclick="fecharModal()">Fechar</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Visualizador de imagem (modal) -->
+    <div id="imageModal" onclick="if(event.target && event.target.id === 'imageModal') fecharVisualizadorImagem()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); align-items:center; justify-content:center; z-index:9999;">
+        <div style="position:relative; max-width:110%; max-height:110%;">
+            <img id="imageModalImg" src="" alt="Imagem ampliada" style="display:block; max-width:200%; max-height:200%; border-radius:6px;" />
+            <div class="close" onclick="fecharVisualizadorImagem()" style="position:absolute; right:-10px; top:-10px; background:#fff; color:#000; border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer;">×</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+        import { adicionarRemedioFirestore, carregarRemediosFirestore, removerRemedioFirestore } from './firestore.js';
+
+    const auth = getAuth();
+    let userId = null;
+    let currentUser = null;
+    let isReadOnlyMode = false;
+    let isModoIdoso = false;
+    // novo: true quando o usuário atual está gerenciando o idoso (cuidador)
+    let isCuidadorMode = false;
+
+        onAuthStateChanged(auth, async user => {
+            if (user) {
+                currentUser = user;
+                await inicializarInterface(user.uid);
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        async function inicializarInterface(uid) {
+            const idosoGerenciado = localStorage.getItem('idosoGerenciado');
+
+            if (idosoGerenciado) {
+                userId = idosoGerenciado;
+                await configurarModoCuidador(uid, idosoGerenciado);
+            } else {
+                userId = uid;
+                await configurarModoUsuario(uid);
+            }
+
+            // Aguarda o renderer da interface existir
+            async function waitForRenderer(timeout = 5000) {
+                const start = Date.now();
+                while (typeof window === 'undefined' || typeof window.adicionarRemedioNaInterface !== 'function') {
+                    if (Date.now() - start > timeout) return false;
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+                return true;
+            }
+
+            const rendererReady = await waitForRenderer();
+            if (rendererReady) {
+                console.log('Renderer de interface disponível.');
+            } else {
+                console.warn('Renderer de interface não definido antes do carregamento (continuando de qualquer forma)');
+            }
+
+            const carregou = await carregarRemediosFirestore(userId);
+            if (!carregou) {
+                console.warn('Falha ao carregar a agenda (ver console).');
+            }
+                gerarDatasDaSemana();
+
+        async function configurarModoCuidador(cuidadorId, idosoId) {
+            try {
+                const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js");
+                const db = getFirestore();
+
+                const idosoDoc = await getDoc(doc(db, 'medidoso', idosoId, 'perfil', 'dados'));
+                const cuidadorDoc = await getDoc(doc(db, 'medidoso', cuidadorId, 'perfil', 'dados'));
+
+                if (idosoDoc.exists() && cuidadorDoc.exists()) {
+                    const idosoData = idosoDoc.data();
+                    const cuidadorData = cuidadorDoc.data();
+
+                    document.getElementById('nomeUsuario').textContent = cuidadorData.nome + ' (Cuidador)';
+                    document.getElementById('cuidadorInfo').style.display = 'block';
+                    document.getElementById('nomePaciente').textContent = idosoData.nome;
+
+                    // cuidadores não devem ativar o modo idoso aqui
+                    document.getElementById('modoToggle').style.display = 'none';
+                    // marca que estamos no modo cuidador (habilita edição/remover via botão Edit)
+                    isCuidadorMode = true;
+                    // mostrar link/dashboard para o cuidador
+                    const menuDashboard = document.getElementById('menuDashboardItem');
+                    if (menuDashboard) menuDashboard.style.display = 'block';
+                    // mostrar botão de adicionar exclusivo do cuidador
+                    const btnAddCuidador = document.getElementById('btnAddCuidador');
+                    if (btnAddCuidador) btnAddCuidador.style.display = 'inline-block';
+                    if (window.updateAddButtonVisibility) window.updateAddButtonVisibility();
+                }
+            } catch (error) {
+                console.error('Erro ao configurar modo cuidador:', error);
+            }
+        }
+
+        async function configurarModoUsuario(uid) {
+            try {
+                const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js");
+                const db = getFirestore();
+
+                const perfilDoc = await getDoc(doc(db, 'medidoso', uid, 'perfil', 'dados'));
+
+                if (perfilDoc.exists()) {
+                    const perfil = perfilDoc.data();
+                    document.getElementById('nomeUsuario').textContent = perfil.nome;
+
+                    if (perfil.cuidadorResponsavel || localStorage.getItem('modoIdoso') === 'true') {
+                        ativarModoIdoso();
+                        isReadOnlyMode = perfil.cuidadorResponsavel ? true : false;
+                    }
+                    // usuário normal não é cuidador gerenciando outro idoso
+                    isCuidadorMode = false;
+                    // ocultar link/dashboard e botões exclusivos do cuidador
+                    const menuDashboard = document.getElementById('menuDashboardItem');
+                    if (menuDashboard) menuDashboard.style.display = 'none';
+                    const btnAddCuidador = document.getElementById('btnAddCuidador');
+                    if (btnAddCuidador) btnAddCuidador.style.display = 'none';
+                    if (window.updateAddButtonVisibility) window.updateAddButtonVisibility();
+                }
+            } catch (error) {
+                console.error('Erro ao configurar modo usuário:', error);
+            }
+        }
+
+        window.toggleModoIdoso = function () {
+            if (isModoIdoso) {
+                desativarModoIdoso();
+            } else {
+                ativarModoIdoso();
+            }
+        }
+        }
+
+       async function ativarModoIdoso() {
+    document.body.classList.add('modo-idoso');
+    document.getElementById('modoToggle').textContent = 'Modo Normal';
+    isModoIdoso = true;
+
+    // Desabilitar edição para o idoso
+    isReadOnlyMode = true;
+    document.body.classList.add('readonly-mode');
+    document.querySelectorAll('.dia').forEach(dia => {
+        dia.style.cursor = 'default'; // Não permite clicar
+        dia.onclick = null; // Desabilita a função de abrir o modal
+    });
+
+    // Se estivermos no modo cuidador gerenciando um idoso, trocar a view
+    if (isCuidadorMode && localStorage.getItem('idosoGerenciado')) {
+        try {
+            // salvar estado atual para restaurar depois
+            window._prevUserId_forModoIdoso = userId;
+            window._prevIsCuidadorMode_forModoIdoso = isCuidadorMode;
+
+            const idosoId = localStorage.getItem('idosoGerenciado');
+            userId = idosoId;
+
+            // desabilitar comportamento de cuidador enquanto estamos simulando idoso
+            isCuidadorMode = false;
+
+            // ocultar botões do cuidador
+            const btnAdd = document.getElementById('btnAddCuidador');
+            if (btnAdd) btnAdd.style.display = 'none';
+            const menuDashboard = document.getElementById('menuDashboardItem');
+            if (menuDashboard) menuDashboard.style.display = 'none';
+
+            // carregar nome do idoso para o cabeçalho
+            const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js");
+            const db = getFirestore();
+            const idosoPerfil = await getDoc(doc(db, 'medidoso', idosoId, 'perfil', 'dados'));
+            if (idosoPerfil.exists()) {
+                const data = idosoPerfil.data();
+                document.getElementById('nomeUsuario').textContent = data.nome || 'Usuário';
+            }
+
+            // recarregar agenda do idoso
+            await carregarRemediosFirestore(userId);
+            adicionarEventosEdicao();
+        } catch (err) {
+            console.error('Erro ao ativar modo idoso como cuidador:', err);
+        }
+    } else {
+        // modo idoso padrão (quando idoso está autenticado diretamente)
+        adicionarEventosEdicao();
+    }
+}
+            adicionarEventosEdicao();
+
+            // atualizar botão de adicionar
+            if (window.updateAddButtonVisibility) window.updateAddButtonVisibility();
+
+        window.updateAddButtonVisibility = function () {
+            const btn = document.getElementById('btnAdicionar');
+            if (!btn) return;
+            btn.style.display = isReadOnlyMode ? 'none' : 'inline-block';
+        }
+
+        function desativarModoIdoso() {
+            document.body.classList.remove('modo-idoso');
+            document.body.classList.remove('readonly-mode');
+            document.getElementById('modoToggle').textContent = 'Modo Idoso';
+            isModoIdoso = false;
+
+            if (window._prevUserId_forModoIdoso) {
+                try {
+                    const prev = window._prevUserId_forModoIdoso;
+                    userId = prev;
+                    isCuidadorMode = !!window._prevIsCuidadorMode_forModoIdoso;
+                    // restaurar nome do cuidador no cabeçalho
+                    const btnAdd = document.getElementById('btnAddCuidador');
+                    if (btnAdd && isCuidadorMode) btnAdd.style.display = 'inline-block';
+                    const menuDashboard = document.getElementById('menuDashboardItem');
+                    if (menuDashboard && isCuidadorMode) menuDashboard.style.display = 'block';
+
+                    // recarregar agenda do cuidador
+                    carregarRemediosFirestore(userId);
+                    adicionarEventosEdicao();
+                } catch (err) {
+                    console.error('Erro ao restaurar modo cuidador após modo idoso:', err);
+                } finally {
+                    delete window._prevUserId_forModoIdoso;
+                    delete window._prevIsCuidadorMode_forModoIdoso;
+                }
+            } else {
+                document.querySelectorAll('.dia').forEach(dia => {
+                    dia.style.cursor = 'pointer';
+                    dia.onclick = abrirModal;
+                });
+            }
+        }
+// Voltar para o dashboard do cuidador
+        window.voltarDashboard = function () {
+            if (!isCuidadorMode) {
+                alert('Acesso negado. Apenas cuidadores podem acessar o painel do cuidador.');
+                return;
+            }
+            localStorage.removeItem('idosoGerenciado');
+            window.location.href = 'dashboard-cuidador.html';
+        }
+
+        window.toggleMenu = function () {
+            const menu = document.getElementById('menu');
+            const menuOverlay = document.getElementById('menuOverlay');
+
+            if (menu) {
+                if (menu.classList.contains('open')) {
+                    menu.classList.remove('open');
+                } else {
+                    menu.classList.add('open');
+                }
+            }
+
+            if (menuOverlay) {
+                menuOverlay.classList.toggle('show');
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            const menu = document.getElementById('menu');
+            const menuToggle = document.getElementById('menuToggle');
+            const isClickInsideMenu = menu.contains(event.target);
+            const isClickInsideButton = menuToggle.contains(event.target);
+            const isMenuOpen = menu.classList.contains('open');
+            const menuOverlay = document.getElementById('menuOverlay');
+
+            if (!isClickInsideMenu && !isClickInsideButton && isMenuOpen) {
+                menu.classList.remove('open');
+                if (menuOverlay) menuOverlay.classList.remove('show');
+            }
+        });
+
+        window.sair = async function () {
+            try {
+                // limpar estado local que pode forçar modos antigos
+                try { localStorage.removeItem('tipoUsuario'); } catch(e) {}
+                try { localStorage.removeItem('idosoGerenciado'); } catch(e) {}
+                try { localStorage.removeItem('modoIdoso'); } catch(e) {}
+                try { localStorage.removeItem('idosoRelatorio'); } catch(e) {}
+
+                await signOut(auth);
+            } catch (err) {
+                console.error('Erro ao deslogar:', err);
+            } finally {
+                // garantir redirecionamento para a tela inicial
+                window.location.href = 'index.html';
+            }
+        }
+// Gerar e exibir as datas da semana atual
+        const hoje = new Date();
+
+        function gerarDatasDaSemana() {
+            const dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            const dataDaSemana = [];
+
+            for (let i = 0; i < 7; i++) {
+                const data = new Date(hoje);
+                data.setDate(hoje.getDate() + (i - hoje.getDay() + 1) % 7);
+                dataDaSemana.push(data.toLocaleDateString('pt-BR'));
+            }
+
+            dias.forEach((dia, index) => {
+                document.getElementById(`data-${dia}`).innerText = dataDaSemana[index];
+            });
+        }
+
+        window.abrirModal = function () {
+            if (!isReadOnlyMode) {
+                document.getElementById('modal').style.display = 'flex';
+            }
+        }
+
+        window.fecharModal = function () {
+            const form = document.getElementById('form-remedio');
+
+            document.getElementById('modal').style.display = 'none';
+            form.reset();
+            document.getElementById('imagem-preview').style.display = 'none';
+
+            delete form.dataset.editMode;
+            delete form.dataset.editDia;
+            delete form.dataset.editHorario;
+            delete form.dataset.editNome;
+
+            document.querySelector('.modal-content h2').textContent = 'Adicionar Medicamento';
+            document.querySelector('#form-remedio button[type="submit"]').textContent = 'Adicionar';
+            document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => {
+                cb.disabled = false;
+                cb.checked = false;
+            });
+        }
+// Mostrar pré-visualização da imagem selecionada
+        window.mostrarImagem = function (event) {
+            const imagemPreview = document.getElementById('imagem-preview');
+            const arquivo = event.target.files[0];
+
+            if (arquivo) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagemPreview.src = e.target.result;
+                    imagemPreview.style.display = 'block';
+                }
+                reader.readAsDataURL(arquivo);
+            }
+        }
+
+        window.abrirVisualizadorImagem = function (url) {
+            const modal = document.getElementById('imageModal');
+            const img = document.getElementById('imageModalImg');
+            if (!modal || !img) return;
+            img.src = url;
+            modal.style.display = 'flex';
+        }
+
+        window.fecharVisualizadorImagem = function () {
+            const modal = document.getElementById('imageModal');
+            const img = document.getElementById('imageModalImg');
+            if (modal) modal.style.display = 'none';
+            if (img) img.src = '';
+        }
+
+        // Configura o botão de adicionar do cuidador (se existir)
+        function setupBtnAddCuidador() {
+            const btn = document.getElementById('btnAddCuidador');
+            if (!btn) return false;
+            // remover listeners anteriores (se houver)
+            btn.replaceWith(btn.cloneNode(true));
+            const fresh = document.getElementById('btnAddCuidador');
+            fresh.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                // garantir que o formulário esteja em modo adicionar
+                const form = document.getElementById('form-remedio');
+                if (form) {
+                    form.reset();
+                    delete form.dataset.editMode;
+                    delete form.dataset.editDia;
+                    delete form.dataset.editHorario;
+                    delete form.dataset.editNome;
+                    document.querySelector('.modal-content h2').textContent = 'Adicionar Medicamento';
+                    document.querySelector('#form-remedio button[type="submit"]').textContent = 'Adicionar';
+                    document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => { cb.disabled = false; cb.checked = false; });
+                }
+                abrirModal();
+            });
+            return true;
+        }
+
+        setupBtnAddCuidador();
+
+        function editarMedicamento(diaNome, remedioData, liElement) {
+            console.log('📝 editarMedicamento chamada com:', remedioData);
+
+            // Bloqueio extra: impedir edição por quem não é cuidador
+            if (!isCuidadorMode) {
+                console.log('⚠️ Edição bloqueada: usuário não é cuidador.');
+                return;
+            }
+
+            document.getElementById('remedio').value = remedioData.nome;
+            document.getElementById('horario').value = remedioData.horario;
+            document.getElementById('observacoes').value = remedioData.observacoes || '';
+
+            if (remedioData.imagem) {
+                const imagemPreview = document.getElementById('imagem-preview');
+                imagemPreview.src = remedioData.imagem;
+                imagemPreview.style.display = 'block';
+            }
+
+            document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach((cb, index) => {
+                const dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+                cb.checked = (dias[index] === diaNome);
+                cb.disabled = true;
+            });
+
+            document.querySelector('.modal-content h2').textContent = 'Editar Medicamento';
+
+            const submitButton = document.querySelector('#form-remedio button[type="submit"]');
+            submitButton.textContent = 'Salvar Alterações';
+
+            const form = document.getElementById('form-remedio');
+            form.dataset.editMode = 'true';
+            form.dataset.editDia = diaNome;
+            form.dataset.editHorario = remedioData.horario;
+            form.dataset.editNome = remedioData.nome;
+
+            console.log('✅ Modal configurado para edição');
+
+            document.getElementById('modal').style.display = 'flex';
+        }
+// Adicionar eventos de edição aos medicamentos (apenas para cuidadores)
+        function adicionarEventosEdicao() {
+            console.log('adicionarEventosEdicao: desativado — edição apenas via botão Edit. isCuidadorMode:', isCuidadorMode);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('form-remedio').addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                if (isReadOnlyMode) return;
+
+                const form = event.target;
+                const isEditMode = form.dataset.editMode === 'true';
+
+                // Impede que o modo idoso edite um medicamento existente
+                if (isEditMode && !isCuidadorMode) {
+                    alert('Apenas cuidadores podem editar medicamentos.');
+                    fecharModal();
+                    return;
+                }
+
+                const remedio = document.getElementById('remedio').value;
+                const horario = document.getElementById('horario').value;
+                const observacoes = document.getElementById('observacoes').value;
+                const imagemPreview = document.getElementById('imagem-preview').src;
+
+                if (isEditMode) {
+                    const diaNome = form.dataset.editDia;
+                    const oldHorario = form.dataset.editHorario;
+                    const oldNome = form.dataset.editNome;
+
+                    await removerRemedioFirestore(userId, diaNome, oldHorario, oldNome);
+
+                    const remedioData = {
+                        nome: remedio,
+                        horario: horario,
+                        observacoes: observacoes,
+                        imagem: imagemPreview !== window.location.href ? imagemPreview : ''
+                    };
+
+                    await adicionarRemedioFirestore(userId, diaNome, remedioData);
+
+                    const lista = document.getElementById(`lista-${diaNome}`);
+                    lista.innerHTML = '';
+                    await carregarRemediosFirestore(userId);
+                    adicionarEventosEdicao();
+
+                } else {
+                    const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+                    const diasSelecionados = [];
+
+                    checkboxes.forEach((checkbox, index) => {
+                        if (checkbox.checked) {
+                            diasSelecionados.push(index);
+                            checkbox.checked = false;
+                        }
+                    });
+
+                    for (const dia of diasSelecionados) {
+                        const diaNome = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'][dia];
+                        const remedioData = {
+                            nome: remedio,
+                            horario: horario,
+                            observacoes: observacoes,
+                            imagem: imagemPreview !== window.location.href ? imagemPreview : ''
+                        };
+
+                        try {
+                            await adicionarRemedioFirestore(userId, diaNome, remedioData);
+                            adicionarRemedioNaInterface(diaNome, remedioData);
+                        } catch (error) {
+                            console.error("Erro ao adicionar medicamento:", error);
+                        }
+                    }
+                }
+
+                form.reset();
+                delete form.dataset.editMode;
+                delete form.dataset.editDia;
+                delete form.dataset.editHorario;
+                delete form.dataset.editNome;
+
+                document.querySelector('.modal-content h2').textContent = 'Adicionar Medicamento';
+                document.querySelector('#form-remedio button[type="submit"]').textContent = 'Adicionar';
+                document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => cb.disabled = false);
+
+                fecharModal();
+            });
+        });
+
+        window.adicionarRemedioNaInterface = function (diaNome, remedioData) {
+            const lista = document.getElementById(`lista-${diaNome}`);
+            const li = document.createElement('li');
+
+            const horarioDiv = document.createElement('div');
+            horarioDiv.className = 'horario-medicamento';
+            horarioDiv.innerHTML = `<i class="fas fa-clock"></i> ${remedioData.horario}`;
+            li.appendChild(horarioDiv);
+
+            const nomeDiv = document.createElement('div');
+            nomeDiv.className = 'nome-medicamento';
+            nomeDiv.innerHTML = `<i class="fas fa-pills"></i> ${remedioData.nome}`;
+            li.appendChild(nomeDiv);
+
+            if (remedioData.observacoes) {
+                const observacoesDiv = document.createElement('div');
+                observacoesDiv.className = 'observacoes-medicamento';
+                observacoesDiv.innerHTML = `<i class="fas fa-sticky-note"></i> ${remedioData.observacoes}`;
+                li.appendChild(observacoesDiv);
+            }
+
+            li.dataset.horario = remedioData.horario;
+
+            if (remedioData.imagem) {
+                const img = document.createElement('img');
+                img.src = remedioData.imagem;
+                img.alt = 'Imagem do medicamento';
+                img.className = 'img-preview';
+                img.onclick = () => abrirVisualizadorImagem(remedioData.imagem);
+                li.appendChild(img);
+            }
+
+            // Restaurar o botão de remoção para cuidadores
+            if (isCuidadorMode) {
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-button';
+                removeButton.innerHTML = '<i class="fas fa-trash"></i>';
+                removeButton.onclick = async () => {
+                    if (confirm('Tem certeza que deseja remover este medicamento?')) {
+                        await removerRemedioFirestore(userId, diaNome, remedioData);
+                        li.remove();
+                    }
+                };
+                li.appendChild(removeButton);
+            }
+            
+            // Restaurar o botão de edição para cuidadores
+            if (isCuidadorMode) {
+                const editButton = document.createElement('button');
+                editButton.className = 'edit-button';
+                editButton.innerHTML = '<i class="fas fa-edit"></i>';
+                editButton.onclick = () => editarMedicamento(diaNome, remedioData, li);
+                li.appendChild(editButton);
+            }
+
+            lista.appendChild(li);
+
+            const itens = Array.from(lista.children);
+            itens.sort((a, b) => a.dataset.horario.localeCompare(b.dataset.horario));
+            lista.innerHTML = '';
+            itens.forEach(item => lista.appendChild(item));
+        }
+
+        window.baixarAgenda = function () {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            const dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            const colunas = [10, 60, 150];
+            let y = 10;
+
+            // Cabeçalho com nome do paciente/usuário e data/hora de geração
+            const pacienteNomeElem = document.getElementById('nomePaciente');
+            const usuarioNomeElem = document.getElementById('nomeUsuario');
+            const pacienteNome = (pacienteNomeElem && pacienteNomeElem.textContent.trim()) ? pacienteNomeElem.textContent.trim() : (usuarioNomeElem ? usuarioNomeElem.textContent.trim() : 'Paciente');
+
+            const agora = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const dataStr = `${pad(agora.getDate())}-${pad(agora.getMonth()+1)}-${agora.getFullYear()}`;
+            const horaStr = `${pad(agora.getHours())}-${pad(agora.getMinutes())}`;
+
+            pdf.setFontSize(14);
+            pdf.text(`Agenda de Medicamentos - ${pacienteNome}`, 10, y);
+            y += 8;
+            pdf.setFontSize(11);
+            pdf.text(`Gerado em: ${dataStr} ${horaStr.replace('-', ':')}`, 10, y);
+            y += 10;
+
+            dias.forEach((dia) => {
+                const lista = document.getElementById(`lista-${dia}`);
+                const items = lista.getElementsByTagName('li');
+
+                pdf.setFontSize(14);
+                pdf.setTextColor(255, 0, 0);
+                pdf.text(dia.charAt(0).toUpperCase() + dia.slice(1) + ':', 10, y);
+
+                y += 7;
+
+                pdf.setFontSize(14);
+                pdf.setTextColor(0, 0, 0);
+
+                for (let item of items) {
+                    if (y > pdf.internal.pageSize.height - 15) {
+                        pdf.addPage();
+                        y = 10;
+                    }
+
+                    const text = item.innerText.replace('×', '').trim();
+                    const [medicamento, ...resto] = text.split(' - ');
+                    const observacoes = resto.join(' - ');
+                    const imagem = item.querySelector('.img-preview');
+
+                    pdf.text(medicamento, colunas[0], y);
+                    pdf.text(observacoes, colunas[1], y);
+
+                    if (imagem) {
+                        pdf.addImage(imagem.src, colunas[2], y - 8, 20, 20);
+                    }
+
+                    y += 14;
+                    pdf.line(colunas[0], y, 200, y);
+                    y += 10;
+                }
+                y += 4;
+            });
+
+            // Gerar nome de arquivo seguro nesse formato: nome_data_hora.pdf
+            const sanitize = (s) => s.replace(/[^a-z0-9\-\_]/gi, '_');
+            const filename = `${sanitize(pacienteNome)}_${dataStr}_${horaStr}.pdf`;
+            pdf.save(filename);
+        }
+
+        // Adicione uma verificação para impedir que um idoso seja adicionado a mais de um cuidador
+async function verificarIdosoConectado(idosoId) {
+    try {
+        const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js");
+        const db = getFirestore();
+
+        const idosoDoc = await getDoc(doc(db, 'medidoso', idosoId, 'perfil', 'dados'));
+
+        if (idosoDoc.exists()) {
+            const idosoData = idosoDoc.data();
+            if (idosoData.cuidadorConectado) {
+                return idosoData.cuidadorConectado; // Retorna o ID do cuidador conectado
+            }
+        }
+
+        return null; // Nenhum cuidador conectado
+    } catch (error) {
+        console.error('Erro ao verificar conexão do idoso:', error);
+        return null;
+    }
+}
+
+async function conectarCuidadorAIdoso(cuidadorId, idosoId) {
+    try {
+        const { getFirestore, doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js");
+        const db = getFirestore();
+
+        const cuidadorConectado = await verificarIdosoConectado(idosoId);
+
+        if (cuidadorConectado) {
+            if (cuidadorConectado === cuidadorId) {
+                alert('Você já está conectado a este idoso.');
+            } else {
+                alert('Este idoso já está conectado a outro cuidador.');
+            }
+            return;
+        }
+
+        // Atualiza o perfil do idoso para incluir o cuidador conectado
+        await updateDoc(doc(db, 'medidoso', idosoId, 'perfil', 'dados'), {
+            cuidadorConectado: cuidadorId
+        });
+
+        alert('Conexão com o idoso realizada com sucesso!');
+    } catch (error) {
+        console.error('Erro ao conectar cuidador ao idoso:', error);
+        alert('Erro ao conectar cuidador ao idoso.');
+    }
+}
+    </script>
+</body>
+
+</html>

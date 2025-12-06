@@ -1,0 +1,467 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Dados do Usuário</title>
+
+    <!-- Importação da fonte Poppins do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilo geral */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #0072ff; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Título da página */
+        .titulo {
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            font-size: 36px;
+            font-weight: 600;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            background: #00a4e4; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0; 
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin-top: 160px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        /* Efeito de hover no formulário */
+        .container:hover {
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estilo dos campos do formulário */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #264653;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 40px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Ícones dentro dos campos */
+        .form-group i {
+            position: absolute;
+            left: 10px;
+            top: 38px; 
+            color: #aaa;
+            font-size: 20px;
+        }
+
+        /* Efeito de foco nos campos */
+        input:focus {
+            outline: none;
+            border-color: #00bfff;
+            box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
+        }
+
+        /* Estilo dos botões */
+        .buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn-cancel, .btn-confirm, .btn-back {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-cancel {
+            background-color: #e74c3c; 
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn-cancel:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-confirm {
+            background-color: #00bfff; 
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background-color: #0072ff; 
+        }
+
+        .btn-back {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #00bfff; 
+            color: white;
+        }
+
+        .btn-back:hover {
+            background-color: #0072ff; 
+        }
+
+        /* Estilo da mensagem de erro */
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        /* Campos específicos para cuidador */
+        .cuidador-fields {
+            display: none;
+        }
+
+        .cuidador-fields.show {
+            display: block;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .btn-cancel, .btn-confirm {
+                width: 100%;
+                margin-top: 10px;
+                margin-right: 0;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <!-- Adicionando uma biblioteca de ícones -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- Título centralizado -->
+    <div class="titulo" id="tituloPagina">Editar Dados do Usuário</div>
+
+    <!-- Container principal -->
+    <div class="container">
+        <form id="formulario">
+            <!-- Campo Nome com ícone -->
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <i class="fas fa-user"></i>
+                <input type="text" id="nome" name="nome" placeholder="Digite seu nome">
+            </div>
+
+            <!-- Campo E-mail com ícone -->
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" name="email" placeholder="Digite seu e-mail">
+            </div>
+
+            <!-- Campos específicos para cuidador -->
+            <div class="cuidador-fields" id="cuidadorFields">
+                <div class="form-group">
+                    <label for="telefone">Telefone</label>
+                    <i class="fas fa-phone"></i>
+                    <input type="text" id="telefone" placeholder="(00) 00000-0000" maxlength="15">
+                </div>
+                
+                <div class="form-group">
+                    <label for="profissao">Profissão/Função</label>
+                    <i class="fas fa-briefcase"></i>
+                    <input type="text" id="profissao" placeholder="Ex: Enfermeiro, Familiar">
+                </div>
+            </div>
+
+            <!-- Campo Senha com ícone -->
+            <div class="form-group">
+                <label for="senha">Nova Senha (deixe em branco para não alterar)</label>
+                <i class="fas fa-lock"></i>
+                <input type="password" id="senha" name="senha" placeholder="Digite sua senha">
+            </div>
+
+            <!-- Campo Confirmar Senha -->
+            <div class="form-group">
+                <label for="confirmar-senha">Confirmar Senha</label>
+                <i class="fas fa-lock"></i>
+                <input type="password" id="confirmar-senha" name="confirmar-senha" placeholder="Confirme sua senha">
+            </div>
+
+            <!-- Mensagem de erro de senha -->
+            <div class="error-message" id="error-message">As senhas não coincidem!</div>
+            <div class="error-message" id="same-password-message">A nova senha não pode ser igual à senha atual!</div>
+
+            <!-- Botões de Ação cancelar e confirmar -->
+            <div class="buttons">
+                <button type="button" class="btn-cancel" id="btnCancelar">Cancelar</button>
+                <button type="submit" class="btn-confirm">Confirmar</button>
+            </div>
+        </form>
+    </div>
+
+    <button class="btn-back" id="btnVoltar">Voltar à Página Inicial</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMQtt7KP30AcHi72FHtaZtZOXIYL7DVv0",
+            authDomain: "medidoso.firebaseapp.com",
+            projectId: "medidoso",
+            storageBucket: "medidoso.appspot.com",
+            messagingSenderId: "1006734497522",
+            appId: "1:1006734497522:web:98f5911a09c35146bb626b",
+            databaseURL: "https://medidoso-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let tipoUsuario = null;
+
+        // Função para máscara de telefone
+        function mascaraTelefone(input) {
+            let valor = input.value.replace(/\D/g, '');
+            valor = valor.substring(0, 11);
+            
+            if (valor.length <= 10) {
+                valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else {
+                valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            }
+            
+            input.value = valor;
+        }
+
+        // Adicionar evento de máscara ao campo telefone
+        document.getElementById('telefone').addEventListener('keyup', function() {
+            mascaraTelefone(this);
+        });
+
+        // Função para buscar e preencher os dados do usuário
+        async function carregarDadosDoUsuario() {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    const userRef = doc(db, 'medidoso', user.uid, 'perfil', 'dados');
+                    const docSnap = await getDoc(userRef);
+                    
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        tipoUsuario = userData.tipo;
+                        
+                        // Atualizar título baseado no tipo
+                        const titulo = document.getElementById('tituloPagina');
+                        if (tipoUsuario === 'cuidador') {
+                            titulo.textContent = 'Editar Dados do Cuidador';
+                            document.getElementById('cuidadorFields').classList.add('show');
+                            
+                            // Preencher campos específicos do cuidador
+                            document.getElementById('telefone').value = userData.telefone || '';
+                            document.getElementById('profissao').value = userData.profissao || '';
+                        } else {
+                            titulo.textContent = 'Editar Dados do Usuário';
+                        }
+                        
+                        // Preencher campos comuns
+                        document.getElementById("nome").value = userData.nome || '';
+                        document.getElementById("email").value = userData.email || '';
+                    }
+                } catch (error) {
+                    console.log("Erro ao obter os dados do usuário:", error);
+                }
+            }
+        }
+
+        // Função para atualizar os dados do usuário
+        async function atualizarDadosDoUsuario(event) {
+            event.preventDefault();
+            
+            const nome = document.getElementById("nome").value;
+            const email = document.getElementById("email").value;
+            const senha = document.getElementById("senha").value;
+            const confirmarSenha = document.getElementById("confirmar-senha").value;
+            const user = auth.currentUser;
+
+            // Esconder mensagens de erro
+            document.getElementById("error-message").style.display = 'none';
+            document.getElementById("same-password-message").style.display = 'none';
+
+            // Verificações de validação
+            if (senha && senha !== confirmarSenha) {
+                document.getElementById("error-message").style.display = 'block';
+                return;
+            }
+
+            try {
+                // Atualizar email se foi alterado
+                if (user && email !== user.email) {
+                        try {
+                            await updateEmail(user, email);
+                            console.log("E-mail atualizado com sucesso.");
+                        } catch (err) {
+                            if (err && err.code === 'auth/requires-recent-login') {
+                                // tentar reautenticar e refazer a operação
+                                const reauthOk = await reauthenticateWithPrompt(user);
+                                if (reauthOk) {
+                                    await updateEmail(user, email);
+                                    console.log("E-mail atualizado com sucesso após reautenticação.");
+                                } else {
+                                    throw new Error('Reautenticação necessária para alterar e-mail.');
+                                }
+                            } else {
+                                throw err;
+                            }
+                        }
+                }
+
+                // Atualizar senha se foi preenchida
+                if (user && senha) {
+                    try {
+                        await updatePassword(user, senha);
+                        console.log("Senha atualizada com sucesso.");
+                    } catch (err) {
+                        if (err && err.code === 'auth/requires-recent-login') {
+                            const reauthOk = await reauthenticateWithPrompt(user);
+                            if (reauthOk) {
+                                await updatePassword(user, senha);
+                                console.log("Senha atualizada com sucesso após reautenticação.");
+                            } else {
+                                throw new Error('Reautenticação necessária para alterar senha.');
+                            }
+                        } else {
+                            throw err;
+                        }
+                    }
+                }
+
+                // Preparar dados para atualização
+                const dadosAtualizacao = {
+                    nome: nome,
+                    email: email
+                };
+
+                // Se for cuidador, incluir campos específicos
+                if (tipoUsuario === 'cuidador') {
+                    const telefone = document.getElementById('telefone').value;
+                    const profissao = document.getElementById('profissao').value;
+                    
+                    // Validar telefone
+                    if (telefone) {
+                        const telefoneNumeros = telefone.replace(/\D/g, '');
+                        if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+                            alert('Telefone inválido! Use o formato (00) 00000-0000');
+                            return;
+                        }
+                    }
+                    
+                    dadosAtualizacao.telefone = telefone;
+                    dadosAtualizacao.profissao = profissao;
+                }
+
+                // Atualizar dados no Firestore
+                const userRef = doc(db, 'medidoso', user.uid, 'perfil', 'dados');
+                await updateDoc(userRef, dadosAtualizacao);
+                
+                alert('Dados atualizados com sucesso!');
+                
+            } catch (error) {
+                console.error("Erro ao atualizar dados:", error);
+                alert('Erro ao atualizar dados: ' + error.message);
+            }
+        }
+
+        async function reauthenticateWithPrompt(user) {
+            try {
+                if (!user || !user.providerData || user.providerData.length === 0) return false;
+                const providers = user.providerData.map(p => p.providerId);
+                if (!providers.includes('password')) {
+                    alert('Sua conta usa login externo. Por favor, faça logout e entre novamente para alterar credenciais.');
+                    return false;
+                }
+
+                const currentPassword = prompt('Por favor, insira sua senha atual para confirmar alterações sensíveis:');
+                if (!currentPassword) return false;
+
+                const credential = EmailAuthProvider.credential(user.email, currentPassword);
+                await reauthenticateWithCredential(user, credential);
+                return true;
+            } catch (err) {
+                console.error('Reautenticação falhou:', err);
+                alert('Reautenticação falhou. Por favor, tente fazer login novamente.');
+                return false;
+            }
+        }
+
+        // Função para voltar
+        document.getElementById("btnCancelar").addEventListener("click", function() {
+            window.history.back();
+        });
+
+        document.getElementById("btnVoltar").addEventListener("click", function() {
+            window.history.back();
+        });
+
+        // Escutar o evento de submissão do formulário
+        document.getElementById("formulario").addEventListener("submit", atualizarDadosDoUsuario);
+
+        // Carregar dados do usuário ao iniciar
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                carregarDadosDoUsuario();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

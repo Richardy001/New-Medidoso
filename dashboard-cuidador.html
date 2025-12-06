@@ -1,0 +1,831 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Cuidador</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #FEC364;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .main-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #FEC364;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .actions-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, #FEC364 0%, #f0ae45 100%);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            color: white;
+            text-decoration: none;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(254, 195, 100, 0.4);
+        }
+
+        .action-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .idosos-list {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .idoso-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .idoso-item:hover {
+            background: #f8f9fa;
+        }
+
+        .idoso-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .idoso-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .idoso-details h4 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .idoso-details p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .idoso-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        /* Botão grande de adicionar medicamento no dashboard */
+        .btn-add-med-dashboard {
+            background: linear-gradient(135deg,#28a745 0%, #1e7e34 100%);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(40,167,69,0.2);
+            transition: transform .12s ease, box-shadow .12s ease;
+            margin-left: 12px;
+        }
+
+        .btn-add-med-dashboard:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(40,167,69,0.28); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="logo-medidoso.jpeg" alt="Logo">
+            <h3>MEDIDOSO - Cuidador</h3>
+        </div>
+        <div class="user-info">
+            <span id="nomeUsuario">Carregando...</span>
+            <div class="user-avatar" id="avatarUsuario">C</div>
+            <button id="btnAddMedDashboard" class="btn-add-med-dashboard" onclick="abrirAdicionarMedicamento()" style="display:none;">+ Adicionar Medicamento</button>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="welcome-section">
+            <h1>Bem-vindo ao seu Dashboard</h1>
+            <p>Gerencie os medicamentos dos seus pacientes de forma eficiente e organizada.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalIdosos">0</div>
+                <div class="stat-label">Pacientes Gerenciados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalMedicamentos">0</div>
+                <div class="stat-label">Medicamentos Ativos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="alertasHoje">0</div>
+                <div class="stat-label">Alertas Hoje</div>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <h2>Ações Rápidas</h2>
+            <div class="action-grid">
+                <a href="#" class="action-card" onclick="abrirModalNovoIdoso()">
+                    <i class="fas fa-user-plus action-icon"></i>
+                    <div>Adicionar Paciente</div>
+                </a>
+                <a href="#" class="action-card" onclick="verRelatorios()">
+                    <i class="fas fa-chart-bar action-icon"></i>
+                    <div>Relatórios</div>
+                </a>
+                <a href="#" class="action-card" onclick="configuracoes()">
+                    <i class="fas fa-cog action-icon"></i>
+                    <div>Configurações</div>
+                </a>
+                <a href="#" class="action-card" onclick="ajuda()">
+                    <i class="fas fa-question-circle action-icon"></i>
+                    <div>Ajuda</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="idosos-list">
+            <h2>Pacientes Gerenciados</h2>
+            <div id="listaIdosos">
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>Nenhum paciente cadastrado</h3>
+                    <p>Comece adicionando seu primeiro paciente para gerenciar seus medicamentos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para selecionar idoso antes de abrir agenda para adicionar medicamento -->
+    <div class="modal" id="modalSelecionarIdosoMedic">
+        <div class="modal-content">
+            <h3>Adicionar Medicamento - Selecionar Paciente</h3>
+            <div class="form-group">
+                <label for="selectIdosoParaMedic">Selecione o paciente</label>
+                <select id="selectIdosoParaMedic" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd"></select>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:12px;">
+                <button class="btn" type="button" onclick="fecharModalSelecionarIdosoMedic()">Cancelar</button>
+                <button class="btn btn-success" id="btnConfirmarSelecionarIdoso">Abrir Agenda</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Selecionar Idoso Existente -->
+    <div class="modal" id="modalNovoIdoso">
+        <div class="modal-content">
+            <h3>Adicionar Paciente Existente</h3>
+            <form id="formNovoIdoso">
+                <div class="form-group">
+                    <label for="selectIdosoExistente">Selecione um paciente já cadastrado</label>
+                    <select id="selectIdosoExistente" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ddd">
+                        <option value="">Carregando pacientes...</option>
+                    </select>
+                </div>
+                <div id="infoSemPacientes" style="display:none; color:#666; margin-bottom:10px;">Nenhum paciente cadastrado disponível para adicionar.</div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="btnAdicionarExistente">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, collection, getDocs, collectionGroup } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMQtt7KP30AcHi72FHtaZtZOXIYL7DVv0",
+            authDomain: "medidoso.firebaseapp.com",
+            databaseURL: "https://medidoso-default-rtdb.firebaseio.com",
+            projectId: "medidoso",
+            storageBucket: "medidoso.appspot.com",
+            messagingSenderId: "1006734497522",
+            appId: "1:1006734497522:web:98f5911a09c35146bb626b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await verificarTipoUsuario(user.uid);
+                await carregarDashboard(user.uid);
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        async function verificarTipoUsuario(uid) {
+            try {
+                const perfilDoc = await getDoc(doc(db, 'medidoso', uid, 'perfil', 'dados'));
+                if (perfilDoc.exists()) {
+                    const perfil = perfilDoc.data();
+                    if (perfil.tipo !== 'cuidador') {
+                        // Se não é cuidador, redireciona para agenda normal
+                        window.location.href = 'agenda-semanal.html';
+                    }
+                    
+                    // Atualizar interface com dados do usuário
+                    document.getElementById('nomeUsuario').textContent = perfil.nome;
+                    document.getElementById('avatarUsuario').textContent = perfil.nome.charAt(0).toUpperCase();
+                }
+            } catch (error) {
+                console.error('Erro ao verificar tipo de usuário:', error);
+            }
+        }
+
+        async function carregarDashboard(uid) {
+            await carregarEstatisticas(uid);
+            await carregarListaIdosos(uid);
+        }
+
+        async function carregarEstatisticas(uid) {
+            try {
+                const perfilDoc = await getDoc(doc(db, 'medidoso', uid, 'perfil', 'dados'));
+                if (perfilDoc.exists()) {
+                    const perfil = perfilDoc.data();
+                    const idososGerenciados = perfil.idososGerenciados || [];
+                    
+                    document.getElementById('totalIdosos').textContent = idososGerenciados.length;
+                    
+                    // Contar medicamentos total
+                    let totalMedicamentos = 0;
+                    for (const idoso of idososGerenciados) {
+                        try {
+                            const agendaSnapshot = await getDocs(collection(db, 'medidoso', idoso.id, 'agenda'));
+                            agendaSnapshot.forEach(doc => {
+                                const dia = doc.data();
+                                totalMedicamentos += (dia.medicamentos || []).length;
+                            });
+                        } catch (error) {
+                            console.log('Erro ao contar medicamentos do idoso:', idoso.nome);
+                        }
+                    }
+                    
+                    document.getElementById('totalMedicamentos').textContent = totalMedicamentos;
+                    document.getElementById('alertasHoje').textContent = '0'; // Implementar depois
+                }
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        async function carregarListaIdosos(uid) {
+            try {
+                const perfilDoc = await getDoc(doc(db, 'medidoso', uid, 'perfil', 'dados'));
+                if (perfilDoc.exists()) {
+                    const perfil = perfilDoc.data();
+                    const idososGerenciados = perfil.idososGerenciados || [];
+                    
+                    const listaElement = document.getElementById('listaIdosos');
+                    
+                    if (idososGerenciados.length === 0) {
+                        listaElement.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-users"></i>
+                                <h3>Nenhum paciente cadastrado</h3>
+                                <p>Comece adicionando seu primeiro paciente para gerenciar seus medicamentos.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    let html = '';
+                    for (const idoso of idososGerenciados) {
+                        html += `
+                            <div class="idoso-item">
+                                <div class="idoso-info">
+                                    <div class="idoso-avatar">${idoso.nome.charAt(0).toUpperCase()}</div>
+                                    <div class="idoso-details">
+                                        <h4>${idoso.nome}</h4>
+                                        <p>${idoso.relacao} ${idoso.idade ? `• ${idoso.idade} anos` : ''}</p>
+                                        ${idoso.observacoes ? `<p style="font-style: italic;">${idoso.observacoes}</p>` : ''}
+                                    </div>
+                                </div>
+                                <div class="idoso-actions">
+                                    <button class="btn btn-primary" onclick="gerenciarAgenda('${idoso.id}')">
+                                        <i class="fas fa-calendar"></i> Agenda
+                                    </button>
+                                    <button class="btn btn-success" onclick="verRelatorio('${idoso.id}')">
+                                        <i class="fas fa-chart-line"></i> Relatório
+                                    </button>
+                                    <button class="btn btn-danger" onclick="removerIdoso('${idoso.id}')">
+                                        <i class="fas fa-trash"></i> Remover
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    listaElement.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar lista de idosos:', error);
+            }
+        }
+
+        window.abrirModalNovoIdoso = function() {
+            // Ao abrir modal, buscar pacientes já cadastrados e popular o select
+            buscarPacientesExistentes().then(() => {
+                document.getElementById('modalNovoIdoso').style.display = 'flex';
+            });
+        }
+
+        window.fecharModal = function() {
+            document.getElementById('modalNovoIdoso').style.display = 'none';
+            document.getElementById('formNovoIdoso').reset();
+        }
+
+        window.gerenciarAgenda = function(idosoId) {
+            // Salvar ID do idoso no localStorage para a agenda saber qual gerenciar
+            localStorage.setItem('idosoGerenciado', idosoId);
+            window.location.href = 'agenda-semanal.html';
+        }
+
+        // Abre modal de seleção de idoso para adicionar medicamento
+        window.abrirAdicionarMedicamento = async function() {
+            try {
+                // carregar lista de idosos gerenciados
+                const perfilDoc = await getDoc(doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados'));
+                if (!perfilDoc.exists()) return alert('Perfil do cuidador não encontrado.');
+                const perfil = perfilDoc.data();
+                const idososGerenciados = perfil.idososGerenciados || [];
+
+                const select = document.getElementById('selectIdosoParaMedic');
+                select.innerHTML = '';
+
+                if (idososGerenciados.length === 0) {
+                    alert('Nenhum paciente gerenciado encontrado. Adicione pacientes primeiro.');
+                    return;
+                }
+
+                idososGerenciados.forEach(i => {
+                    const opt = document.createElement('option');
+                    opt.value = i.id;
+                    opt.textContent = i.nome;
+                    select.appendChild(opt);
+                });
+
+                document.getElementById('modalSelecionarIdosoMedic').style.display = 'flex';
+            } catch (error) {
+                console.error('Erro ao abrir seleção de idoso para medicamento:', error);
+                alert('Erro ao abrir seleção. Veja console.');
+            }
+        }
+
+        window.fecharModalSelecionarIdosoMedic = function() {
+            const m = document.getElementById('modalSelecionarIdosoMedic');
+            if (m) m.style.display = 'none';
+        }
+
+        // confirmar seleção: navegar para agenda do idoso selecionado
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('btnConfirmarSelecionarIdoso');
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    const select = document.getElementById('selectIdosoParaMedic');
+                    const id = select ? select.value : null;
+                    if (!id) return alert('Selecione um paciente.');
+                    fecharModalSelecionarIdosoMedic();
+                    gerenciarAgenda(id);
+                });
+            }
+        });
+
+        window.verRelatorio = function(idosoId) {
+            localStorage.setItem('idosoRelatorio', idosoId);
+            window.location.href = 'relatorio.html';
+        }
+
+        window.removerIdoso = async function(idosoId) {
+            if (!confirm('Tem certeza que deseja remover este paciente? Esta ação removerá a referência no seu perfil e apagará os dados locais do paciente.')) return;
+            if (!currentUser) {
+                alert('Usuário não autenticado. Atualize a página e tente novamente.');
+                return;
+            }
+
+            try {
+                // 1) Remover referência do cuidador (filtrar por id) - desvincular apenas
+                const perfilCuidadorRef = doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados');
+                const perfilSnap = await getDoc(perfilCuidadorRef);
+                if (perfilSnap.exists()) {
+                    const perfil = perfilSnap.data();
+                    const arr = (perfil.idososGerenciados || []).filter(i => i.id !== idosoId);
+                    await updateDoc(perfilCuidadorRef, { idososGerenciados: arr });
+                }
+
+                // 2) Opcional: limpar o campo cuidadorResponsavel no perfil do idoso se apontar para este cuidador
+                try {
+                    const perfilIdosoRef = doc(db, 'medidoso', idosoId, 'perfil', 'dados');
+                    const perfilIdosoSnap = await getDoc(perfilIdosoRef);
+                    if (perfilIdosoSnap.exists()) {
+                        const dados = perfilIdosoSnap.data();
+                        if (dados.cuidadorResponsavel && dados.cuidadorResponsavel === currentUser.uid) {
+                            // setar para null para indicar desvinculação (não apaga o documento)
+                            await updateDoc(perfilIdosoRef, { cuidadorResponsavel: null });
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Não foi possível atualizar perfil do idoso (cuidadorResponsavel):', err);
+                }
+
+                alert('Paciente desvinculado com sucesso.');
+                await carregarDashboard(currentUser.uid);
+            } catch (error) {
+                console.error('Erro ao remover paciente:', error);
+                alert('Erro ao desvincular paciente: ' + (error.message || error));
+            }
+        }
+
+        window.verRelatorios = function() {
+            window.location.href = 'relatorio.html';
+        }
+
+        window.configuracoes = function() {
+            window.location.href = 'editUser.html';
+        }
+
+        window.ajuda = function() {
+            alert('Funcionalidade de ajuda em desenvolvimento');
+        }
+
+        // Busca pacientes já cadastrados na raiz 'medidoso/*/perfil/dados' com tipo==='idoso'
+        async function buscarPacientesExistentes() {
+            const select = document.getElementById('selectIdosoExistente');
+            const infoSem = document.getElementById('infoSemPacientes');
+            select.innerHTML = `<option value="">Carregando pacientes...</option>`;
+            infoSem.style.display = 'none';
+
+            try {
+                // Usar collectionGroup para buscar todos os documentos da subcoleção 'perfil' (mais eficiente e direto)
+                const perfilDocs = await getDocs(collectionGroup(db, 'perfil'));
+                const pacientes = [];
+
+                for (const pDoc of perfilDocs.docs) {
+                    try {
+                        // esperamos que o documento de perfil tenha id 'dados'
+                        if (pDoc.id !== 'dados') continue;
+                        const data = pDoc.data();
+                        if (data && data.tipo === 'idoso') {
+                            // obter id do documento pai (medidoso/{idosoId})
+                            const pai = pDoc.ref.parent.parent; // coleção 'perfil' -> documento medidoso/{id}
+                            const idPaciente = pai ? pai.id : null;
+                            if (idPaciente) {
+                                pacientes.push({ id: idPaciente, nome: data.nome || idPaciente, idade: data.idade || null });
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Erro ao processar perfil doc', pDoc.id, err);
+                    }
+                }
+
+                // Remover pacientes que já estejam vinculados ao cuidador
+                let vinculados = [];
+                if (currentUser) {
+                    const perfilCuidadorSnap = await getDoc(doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados'));
+                    if (perfilCuidadorSnap.exists()) {
+                        vinculados = (perfilCuidadorSnap.data().idososGerenciados || []).map(i => i.id);
+                    }
+                }
+
+                const disponiveis = pacientes.filter(p => !vinculados.includes(p.id));
+
+                if (disponiveis.length === 0) {
+                    select.innerHTML = '<option value="">Nenhum paciente disponível</option>';
+                    select.disabled = true;
+                    infoSem.style.display = 'block';
+                    document.getElementById('btnAdicionarExistente').disabled = true;
+                    return;
+                }
+
+                // Preencher select
+                select.disabled = false;
+                select.innerHTML = '<option value="">-- Selecione um paciente --</option>' + disponiveis.map(p => `<option value="${p.id}">${p.nome}${p.idade ? ' • ' + p.idade + ' anos' : ''}</option>`).join('');
+                document.getElementById('btnAdicionarExistente').disabled = false;
+            } catch (error) {
+                console.error('Erro ao buscar pacientes existentes:', error);
+                select.innerHTML = '<option value="">Erro ao carregar pacientes</option>';
+                select.disabled = true;
+                infoSem.style.display = 'block';
+                document.getElementById('btnAdicionarExistente').disabled = true;
+            }
+        }
+
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error);
+            }
+        }
+
+        // Form para adicionar paciente existente ao cuidador
+        document.getElementById('formNovoIdoso').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const select = document.getElementById('selectIdosoExistente');
+            const idosoId = select.value;
+
+            if (!idosoId) {
+                alert('Selecione um paciente cadastrado para adicionar.');
+                return;
+            }
+
+            if (!currentUser) {
+                alert('Usuário não autenticado. Atualize a página e tente novamente.');
+                return;
+            }
+
+            try {
+                const perfilCuidadorRef = doc(db, 'medidoso', currentUser.uid, 'perfil', 'dados');
+                const perfilSnap = await getDoc(perfilCuidadorRef);
+                let jaVinculado = false;
+                if (perfilSnap.exists()) {
+                    const perfil = perfilSnap.data();
+                    const idososGerenciados = perfil.idososGerenciados || [];
+                    if (idososGerenciados.some(i => i.id === idosoId)) {
+                        jaVinculado = true;
+                    }
+                }
+
+                if (jaVinculado) {
+                    alert('Este paciente já está vinculado ao seu perfil.');
+                    fecharModal();
+                    return;
+                }
+
+                // Obter dados do paciente selecionado para gravar no array do cuidador
+                const perfilIdosoRef = doc(db, 'medidoso', idosoId, 'perfil', 'dados');
+                const perfilIdosoSnap = await getDoc(perfilIdosoRef);
+                if (!perfilIdosoSnap.exists()) {
+                    alert('Dados do paciente não encontrados.');
+                    return;
+                }
+                const dadosIdoso = perfilIdosoSnap.data();
+
+                // Adicionar referência do idoso ao cuidador
+                await updateDoc(perfilCuidadorRef, {
+                    idososGerenciados: arrayUnion({
+                        id: idosoId,
+                        nome: dadosIdoso.nome || 'Sem nome',
+                        relacao: '',
+                        idade: dadosIdoso.idade || null,
+                        observacoes: dadosIdoso.observacoes || ''
+                    })
+                });
+
+                alert('Paciente vinculado com sucesso!');
+                fecharModal();
+                await carregarDashboard(currentUser.uid);
+            } catch (error) {
+                console.error('Erro ao vincular paciente:', error);
+                alert('Erro ao vincular paciente: ' + (error.message || error));
+            }
+        });
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalNovoIdoso');
+            if (event.target === modal) {
+                fecharModal();
+            }
+        }
+    </script>
+</body>
+</html>
