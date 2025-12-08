@@ -2,6 +2,10 @@
 
 ## 1. Introdução
 
+**Projeto:** MEDIDOSO  
+**Equipe:** 4 membros (Gustavo Zanella, Gustavo Alves, Guilherme Garghetti, Richardy Zaparolli)  
+**Nota:** Diogo Felipe Alves saiu durante desenvolvimento; funções assumidas por Guilherme
+
 Este documento descreve o plano de testes, os casos de teste e os procedimentos para validar a funcionalidade, usabilidade, confiabilidade e segurança do sistema MEDIDOSO. Os testes abrangem cenários de autenticação, gerenciamento de medicamentos, diferenciação de perfis (cuidador/idoso) e modo acessível.
 
 **Objetivo:** Garantir que o sistema funcione conforme especificado, sem erros críticos, e seja seguro e acessível para idosos e cuidadores.
@@ -702,7 +706,7 @@ O sistema MEDIDOSO foi submetido a testes funcionais e de performance **no escop
 ---
 ## 11. Assinatura e Aprovação
 
-| Papel | Nome | Data | Assinatura |
+| Papel | Nome | Data | Assinatura |,0
 |-------|------|------|-----------|
 | QA/Testes | Richardy Zaparolli | 08/12/2025 | ✅ |
 | Líder de Projeto | Gustavo G. Zanella | 08/12/2025 | ✅ |
