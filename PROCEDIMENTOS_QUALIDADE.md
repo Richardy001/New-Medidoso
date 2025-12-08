@@ -225,7 +225,7 @@ Cores não como único identificador ✅
 - Geração de relatórios periódicos
 - Rastreamento de tendências
 
-**Documentos gerados:**
+**Documentos feitos:**
 1. PGQS_ELABORADO.md (918 linhas)
 2. PROCESSO_AGIL.md (649 linhas)
 3. GUIA_DE_TESTES.md (715 linhas)
@@ -344,4 +344,5 @@ Cores não como único identificador ✅
 **Documento versão:** v1.0  
 **Data:** 08/12/2025  
 **Responsável:** Richardy Zaparolli (QA) + Gustavo G. Zanella (Lead)
+
 
