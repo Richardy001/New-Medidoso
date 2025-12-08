@@ -11,6 +11,8 @@
 **Data de Início:** 18 de agosto de 2025  
 **Data de Conclusão:** 08 de dezembro de 2025  
 **Duração Total:** 4 meses (16 semanas)  
+**Equipe:** 4 membros (Gustavo Zanella, Gustavo Alves, Guilherme Garghetti, Richardy Zaparolli)  
+**Nota:** Diogo Felipe Alves saiu durante desenvolvimento; funções assumidas por Guilherme  
 
 ---
 
