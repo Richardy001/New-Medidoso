@@ -7,6 +7,10 @@
 
 ### 1.1 Objetivo
 
+**Projeto:** MEDIDOSO  
+**Equipe:** 4 membros (Gustavo Zanella, Gustavo Alves, Guilherme Garghetti, Richardy Zaparolli)  
+**Nota:** Diogo Felipe Alves saiu durante desenvolvimento; funções assumidas por Guilherme
+
 Este documento mapeia o **débito técnico** acumulado durante o desenvolvimento do MEDIDOSO e propõe **melhorias** para versões futuras, garantindo sustentabilidade e qualidade do código.
 
 ### 1.2 Definição de Débito Técnico
