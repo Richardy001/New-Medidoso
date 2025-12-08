@@ -5,6 +5,10 @@
 
 ## 1. Objetivo
 
+**Projeto:** MEDIDOSO  
+**Equipe:** 4 membros (Gustavo Zanella, Gustavo Alves, Guilherme Garghetti, Richardy Zaparolli)  
+**Nota:** Diogo Felipe Alves saiu durante desenvolvimento; funções assumidas por Guilherme
+
 Este documento apresenta os critérios e práticas de **confiabilidade do software** implementados no projeto **MEDIDOSO**, garantindo que o sistema funcione de forma estável através da infraestrutura do Firebase, tratamento de erros e testes de confiabilidade.
 
 ---
