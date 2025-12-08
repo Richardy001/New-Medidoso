@@ -141,8 +141,7 @@ A equipe foi organizada em dois subgrupos principais:
   - Google Drive: repositório de atas, relatórios e documentos complementares.
 
 ##### Reuniões e periodicidade
-  - Reunião de planejamento: toda segunda-feira às 19h, via Discord, com objetivo de definir as tarefas da semana.
-  - Reunião de acompanhamento: toda quinta-feira às 19h, via Discord, para verificar progresso e identificar bloqueios.
+  - Reunião de planejamento: toda segunda-feira às 20:30h, com objetivo de definir as tarefas da semana.
   - Checkpoints pontuais: conversas rápidas via WhatsApp, quando houver necessidade de ajustes imediatos.
 
 #### Distribuição de tarefas
@@ -201,7 +200,7 @@ O projeto Medidoso adota uma **abordagem híbrida** que combina elementos do **S
    - Observação: Formato assíncrono devido à agenda acadêmica da equipe
 
 3. **Sprint Review + Retrospective**
-   - Quando: Toda quinta-feira às 19h via Discord
+   - Quando: Toda quinta-feira às 19h via WhatsApp, ou pessoalmente.
    - Duração: 45-60 minutos
    - Participantes: Toda a equipe
    - Objetivo: Revisar entregas e melhorar processos
