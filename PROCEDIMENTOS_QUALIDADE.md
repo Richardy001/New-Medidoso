@@ -309,14 +309,14 @@ Cores não como único identificador ✅
 
 | # | Procedimento | Responsável Principal | Status |
 |---|-------------|----------------------|--------|
-| 1 | Testes Manuais | Richardy Zaparolli (QA) | ✅ |
-| 2 | Rastreamento Defects | Richardy Zaparolli (QA) | ✅ |
+| 1 | [Testes Manuais](https://github.com/Richardy001/New-Medidoso/blob/main/GUIA_DE_TESTES.md) | Richardy Zaparolli (QA) | ✅ |
+| 2 | [Rastreamento Defects](https://github.com/Richardy001/New-Medidoso/blob/main/GUIA_DE_TESTES.md) | Richardy Zaparolli (QA) | ✅ |
 | 3 | Code Review | Gustavo G. Zanella (Lead) | ✅ |
 | 4 | Rastreamento Requisitos | Gustavo G. Zanella (Lead) | ✅ |
 | 5 | Validação Segurança | Gustavo Alves (Backend) | ✅ |
 | 6 | Testes Acessibilidade | Guilherme Garghetti (Frontend) | ✅ |
 | 7 | Documentação Código | Toda equipe | ✅ |
-| 8 | Relatórios Qualidade | Richardy Zaparolli (QA) | ✅ |
+| 8 | [Relatórios Qualidade](https://github.com/Richardy001/New-Medidoso/blob/main/AVALIANDO_QUALIDADE_DE_SOFTWARE.md) | Richardy Zaparolli (QA) | ✅ |
 | 9 | Reuniões Acompanhamento | Gustavo G. Zanella (Lead) | ✅ |
 | 10 | Reuniões Code Review | Gustavo G. Zanella (Lead) | ✅ |
 
