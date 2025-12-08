@@ -33,7 +33,7 @@ O projeto utiliza uma **abordagem híbrida** combinando:
 - **Kanban:** Fluxo contínuo de trabalho, WIP (Work In Progress) limitado, transparência visual
 
 ```
-Combinação Ótima para Projeto Académico:
+Projeto Medidoso:
 ├─ Scrum: Estrutura e planejamento
 ├─ Kanban: Flexibilidade para mudanças de requisitos
 └─ Resultado: Entrega contínua com qualidade
