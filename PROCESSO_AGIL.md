@@ -228,7 +228,7 @@ US-05 (Adicionar Medicamento):
 Capacidade = Horas disponíveis por pessoa × Número de pessoas
 Exemplo:
 - Semana: 10 horas disponíveis
-- Equipe: 5 pessoas
+- Equipe: 4 pessoas (5 inicialmente; Diogo saiu no meio do projeto)
 - Disponibilidade: 70% (estudos, outros compromissos)
 - Capacidade total: 10 × 5 × 0.70 = 35 horas por semana
 
@@ -288,43 +288,7 @@ dev (staging/testes)
 Resolve: #45 (issue no GitHub)
 ```
 
-### 6.2 Pull Request (PR) Process
-
-**Fluxo:**
-```
-1. Developer abre PR
-   - Título claro e descritivo
-   - Descrição detalhada
-   - Referência a issues
-   - Screenshots da feature
-
-2. Code Review
-   - Outro desenvolvedor revisa
-   - Gerente aprova
-   - Validação de padrões
-
-3. Testes Manuais (QA)
-   - Abrir página em Live Server
-   - Testar funcionalidade
-   - Verificar compatibilidade
-   - Validar Modo Idoso
-
-4. Merge e Deploy
-   - Merge para branch dev
-   - Deploy em Firebase Hosting
-   - Validação em produção
-```
-
-**Checklist PR:**
-```
-- [x] Código segue padrões do projeto
-- [x] Variáveis com nomes descritivos
-- [x] Sem duplicação de código
-- [x] Performance validada
-- [x] Modo Idoso testado
-- [x] Segurança verificada
-- [x] Compatibilidade em Chrome/Edge
-```
+### 6.3 Ambiente de Desenvolvimento
 
 **Stack Tecnológico:**
 ```
@@ -349,14 +313,20 @@ Ferramentas de Desenvolvimento:
 1. Clone repositório
    git clone https://github.com/Richardy001/New-Medidoso.git
 
-2. Abra os arquivos HTML em um servidor local
-   - Recomendado: Live Server (extensão VS Code)
-   - Ou: python -m http.server 8000
+2. Install dependências
+   npm install
 
-3. Configure credenciais Firebase (firestore.js)
-   - Usar credenciais do projeto já configurado
+3. Configure Firebase
+   - Copiar credenciais de .env.example
+   - Criar .env.local com chaves do projeto
 
-4. Acessa http://localhost:8000 ou a porta configurada
+4. Rodas testes localmente
+   npm test
+
+5. Inicia servidor de desenvolvimento
+   npm run dev
+
+6. Acessa https://medidoso.web.app/
 ```
 
 **Ambientes (Académico):**
@@ -512,20 +482,6 @@ Tempo máximo por nível: 24 horas
 - 20:30 - Sprint Planning (1h)
 - Início da nova sprint
 
-**Terça a Quinta:**
-- Quando necessário - Daily Standup presencial (15 min)
-- Sincronização diária de bloqueadores
-
-**Sexta-feira:**
-- 20:30 - Sprint Review/Demo (1h)
-- 21:30 - Sprint Retrospective (30 min)
-- Validação e aprendizado
-
-**Conforme necessário:**
-- Pair programming para features críticas
-- Resolução de bloqueadores
-- Code reviews extra
-
 ### 8.3 Documentação
 
 **Manter atualizado:**
@@ -540,56 +496,7 @@ Tempo máximo por nível: 24 horas
 
 ## 9. Métricas Ágeis
 
-### 9.1 Burndown Chart (Redução de Escopo)
-
-```
-Story Points Restantes
-
-40 ┤
-   │ ╱─────────────────
-35 │╱       Ideal
-   │ ╱  Atual (sprint 3)
-30 │╱
-   │╱
-25 │
-   │
-20 │
-   │
-15 │
-   │
-10 │
-   │
- 5 │
-   │
- 0 └────────────────────
-   Seg Ter Qua Qui Sex
-
-INTERPRETAÇÃO:
-✅ Linha Atual abaixo da Ideal = Sprint com bom ritmo
-❌ Linha Atual acima da Ideal = Sprint atrasada, talvez aumentar esforço
-```
-
-### 9.2 Velocity (Velocidade de Entrega)
-
-```
-Points por Sprint
-
-25 ┤           ╱╲
-   │      ╱───╱  ╲
-20 │  ╱──╱        ╲___
-   │ ╱
-15 ┤╱
-   │
-10 │
-   │
-   ├──────────────────
-     #1 #2 #3 #4 #5 #6
-
-Média: ~17.5 points por sprint
-Tendência: Estável com leve crescimento
-```
-
-### 9.3 Cycle Time (Tempo de Entrega)
+### 9.1 Cycle Time (Tempo de Entrega)
 
 ```
 Tempo médio de uma feature de ideação até produção
@@ -676,29 +583,6 @@ Defeitos encontrados e resolvidos: 17/17 (100%)
 
 ---
 
-## 11. Próximos Passos e Melhorias
-
-### 11.1 Para Futuros Projetos
-
-📈 **Ferramentas a considerar:**
-- Cypress para testes E2E automatizados
-- Jira para rastreamento mais detalhado
-- SonarQube para análise estática
-- Sentry para monitoramento de produção
-
-🎯 **Práticas a aprofundar:**
-- Mais pair programming em features críticas
-- TDD mais rigoroso desde o início
-- Automated deployment (CI/CD completo)
-- Monitoramento de performance em tempo real
-
-📊 **Métricas a adicionar:**
-- Lead time (tempo do commit ao deploy)
-- DORA metrics (Deployment frequency, etc)
-- NPS (Net Promoter Score) com usuários
-
----
-
 ## 12. Conclusão
 
 O processo ágil implementado no MEDIDOSO combinou o melhor de **Scrum** (estrutura) com **Kanban** (flexibilidade), resultando em:
@@ -753,7 +637,6 @@ A equipe entrega incrementos funcionais a cada sprint (1 semana), com testes com
 | **Desenvolvedor Backend** | Gustavo dos Santos Alves | 08/12/2025 | ✅ |
 | **Desenvolvedor Frontend** | Guilherme Garghetti | 08/12/2025 | ✅ |
 | **QA/Testes** | Richardy Zaparolli | 08/12/2025 | ✅ |
-| **UX/Documentação** | Diogo Felipe Alves | 08/12/2025 | ✅ |
 
 ---
 
