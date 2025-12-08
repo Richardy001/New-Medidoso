@@ -44,7 +44,7 @@ Este documento lista os **10 procedimentos de controle de qualidade que FORAM ef
 ### ✅ PROCEDIMENTO 2: Rastreamento de Defeitos
 
 **Status:** Completo  
-**Execução:** 17 defetos encontrados e resolvidos
+**Execução:** 17 defeitos encontrados e resolvidos
 
 **O que foi feito:**
 - 17 defetos encontrados durante testes
@@ -344,3 +344,4 @@ Cores não como único identificador ✅
 **Documento versão:** v1.0  
 **Data:** 08/12/2025  
 **Responsável:** Richardy Zaparolli (QA) + Gustavo G. Zanella (Lead)
+
