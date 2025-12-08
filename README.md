@@ -1,7 +1,15 @@
-echo "# Medidoso" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
+1. Clone repositório
+   git clone https://github.com/Richardy001/New-Medidoso.git
+
+2. Install dependências
+   npm install
+
+3. Rodas testes localmente
+   npm test
+
+4. Inicia servidor de desenvolvimento
+   npm run dev
+
+5. Acessa https://medidoso.web.app/
+
 git remote add origin https://github.com/Scherer1221/Medidoso.git
-git push -u origin main
