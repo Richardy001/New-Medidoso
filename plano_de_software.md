@@ -40,7 +40,7 @@ Desenvolver um sistema web acessível que permita o gerenciamento centralizado d
 
 Criar um painel de controle para que o responsável possa cadastrar, editar e excluir medicamentos nas agendas.
 Disponibilizar ao idoso uma visualização simples e adaptada (com letras maiores, contraste adequado e navegação facilitada).
-Implementar um sistema de lembretes/notificações para ajudar no cumprimento dos horários.
+Sistema de lembretes/notificações (previsto para evolução futura, não implementado nesta versão).
 Garantir que o sistema seja seguro e confiável, protegendo os dados dos usuários com autenticação.
 Fornecer relatórios básicos de uso, permitindo que o cuidador acompanhe a adesão ao tratamento.
 
@@ -57,7 +57,8 @@ Responsáveis/cuidadores: terão maior controle e organização, podendo cadastr
 
 <h6 style="color: red;">AULA 04</h6>
 
-**📌 O detalhamento completo dos requisitos pode ser encontrado no [Documento de Requisitos (DR)](https://www.example.com/).**
+**📌 O detalhamento completo dos requisitos pode ser encontrado no [Documento de Requisitos (DR)]
+(https://github.com/Richardy001/New-Medidoso/blob/main/documento_de_requisitos.md).**
 
 ### Resumo
 
@@ -122,13 +123,6 @@ Integração com dispositivos de IoT (caixas de remédio inteligentes, smartwatc
   - Validar usabilidade junto ao público-alvo (idosos).
   - Apoiar na documentação técnica e evidências.
 
-- **Desempenhado por:** Guilherme Garghetti
-- **Principais atribuições:**
-  - Criar protótipos e fluxos de navegação.
-  - Realizar pesquisas rápidas de acessibilidade.
-  - Apoiar na documentação de requisitos e atas de reunião.
-  - Centralizar feedbacks e propor melhorias.
-
 ### Estrutura de trabalho
 
 #### Divisões
@@ -178,7 +172,50 @@ A equipe foi organizada em dois subgrupos principais:
 
 <h6 style="color: red;">AULA 08</h6>
 
-Descrever qual é/será o processo ágil implementado e de que maneira ele é/será implementado.
+O projeto Medidoso adota uma **abordagem híbrida** que combina elementos do **Scrum** e **Kanban**, adaptada à realidade de uma equipe acadêmica de 4 pessoas com disponibilidade parcial. Essa escolha permite flexibilidade no gerenciamento de tarefas mantendo cerimônias essenciais para alinhamento e acompanhamento.
+
+#### Metodologia adotada: Scrum adaptado + Kanban
+
+**Características principais:**
+- Sprints de 1 semana (segunda a domingo), alinhadas com o calendário acadêmico
+- Backlog priorizado no GitHub Projects utilizando quadro Kanban
+- Reuniões fixas semanais para planejamento e retrospectiva
+- Entregas incrementais ao final de cada sprint
+- Flexibilidade para ajustar escopo conforme feedbacks recebidos em aula
+
+#### Estrutura das Sprints
+
+**Duração:** 1 semana (de segunda a domingo)
+
+**Cerimônias realizadas:**
+
+1. **Sprint Planning (Planejamento)**
+   - Quando: Toda segunda-feira às 19h via WhatsApp
+   - Duração: 30-45 minutos
+   - Participantes: Toda a equipe
+   - Objetivo: Definir o que será desenvolvido na semana
+
+2. **Daily Stand-up (Alinhamento Diário)**
+   - Quando: Diariamente via WhatsApp (assíncrono)
+   - Formato: Cada membro posta quando disponível
+   - Observação: Formato assíncrono devido à agenda acadêmica da equipe
+
+3. **Sprint Review + Retrospective**
+   - Quando: Toda quinta-feira às 19h via Discord
+   - Duração: 45-60 minutos
+   - Participantes: Toda a equipe
+   - Objetivo: Revisar entregas e melhorar processos
+
+#### Backlog e Priorização
+
+**Ferramenta:** GitHub Projects (Kanban Board)
+
+**Colunas do quadro:**
+- Backlog: Todas as tarefas identificadas
+- À fazer: Tarefas priorizadas e prontas
+- Em andamento: Tarefas em desenvolvimento
+- Em testes: Tarefas em fase de QA
+- Concluído: Tarefas validadas
 
 ### Definição de pronto (DoD)
   - Um requisito, tarefa ou funcionalidade será considerado “Pronto” quando:
@@ -232,7 +269,8 @@ Descrever qual é/será o processo ágil implementado e de que maneira ele é/se
 
 <h6 style="color: red;">AULA 05</h6>
 
-O detalhamento completo de como será realizada a gestão de qualidade do projeto pode ser encontrado no [Plano de Garantia de Qualidade de Software (PGQS)](https://www.example.com/).
+O detalhamento completo de como será realizada a gestão de qualidade do projeto pode ser encontrado no [Plano de Garantia de Qualidade de Software (PGQS)]
+(https://github.com/Richardy001/New-Medidoso/blob/main/PGQS.md).
 
 ---
 
@@ -240,7 +278,7 @@ O detalhamento completo de como será realizada a gestão de qualidade do projet
 
 <h6 style="color: red;">AULA 07</h6>
 
-O detalhamento completo da arquitetura do projeto pode ser encontrado no [Documento de Arquitetura de Software (DAS)](https://www.example.com/).
+O detalhamento completo da arquitetura do projeto pode ser encontrado no [Documento de Arquitetura de Software (DAS)](https://github.com/Richardy001/New-Medidoso/blob/main/DAS_Final.docx).
 
 ---
 
@@ -266,17 +304,17 @@ Listar riscos reais ou potenciais e ações práticas que serão aplicadas para 
 ### Hardware/ambiente
   - Computadores pessoais dos integrantes da equipe.
   - Acesso à internet estável para reuniões e desenvolvimento remoto.
-  - Ambiente de desenvolvimento configurado localmente (Node.js, SQLite, Angular).
-  - Hospedagem em ambiente gratuito (Heroku ou Railway) para deploy acadêmico.
+  - Ambiente de desenvolvimento configurado localmente (Firebase CLI, navegador web).
+  - Hospedagem: Firebase Hosting (tier gratuito).
 
 ### Softwares/ferramentas
   - IDE: Visual Studio Code.
   - Controle de versão: Git + GitHub.
   - Gerenciamento de tarefas: GitHub Projects (Kanban).
   - Prototipagem e design: Figma (versão gratuita).
-  - Banco de dados: SQLite.
-  - Backend: Node.js com Express.
-  - Frontend: Angular (versão atual LTS).
+  - Banco de dados: Firebase Firestore (NoSQL em nuvem).
+  - Backend: Firebase Functions / Firestore Security Rules.
+  - Frontend: HTML5, CSS3, JavaScript ES6+ (vanilla).
+  - Bibliotecas: jsPDF 2.5.1, Font Awesome 6.0.0
+  - Autenticação: Firebase Authentication 
   - Comunicação: Discord (reuniões), WhatsApp (alinhamentos rápidos), Google Drive (documentação).
-
----
