@@ -5,6 +5,10 @@
 
 ## 1. Introdução
 
+**Projeto:** MEDIDOSO  
+**Equipe:** 4 membros (Gustavo Zanella, Gustavo Alves, Guilherme Garghetti, Richardy Zaparolli)  
+**Nota:** Diogo Felipe Alves saiu durante desenvolvimento; funções assumidas por Guilherme
+
 Este documento mapeia os **riscos e ameaças de segurança** identificados no projeto MEDIDOSO e as **ações mitigadoras** implementadas ou planejadas.
 
 **Escopo:** Segurança da aplicação web, autenticação, dados sensíveis, infraestrutura Firebase.
